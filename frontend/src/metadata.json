@@ -1,0 +1,10 @@
+
+{
+  "name": "How Sitter",
+  "description": "A global trust-based house-sitting network that facilitates fiduciary-based home sitting arrangements through verified profiles, WhatsApp connectivity, and legal agreement frameworks.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
