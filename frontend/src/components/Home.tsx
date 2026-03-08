@@ -200,36 +200,7 @@ export const Home: React.FC = () => {
   return (
     <div style={{ fontFamily: G.f, background: G.wh, color: G.s900, minHeight: '100vh' }}>
 
-      {/* ══ NAV ══ */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 300, height: 64,
-        background: G.g900, display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', padding: '0 40px',
-        boxShadow: '0 2px 16px rgba(0,0,0,.25)',
-      }}>
-        {/* Logo */}
-        <div onClick={() => nav('/')} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', flexShrink:0 }}>
-          <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
-            <rect width="34" height="34" rx="9" fill={G.y500}/>
-            <path d="M17 7L8 14v13h6v-8h6v8h6V14z" fill={G.g900} strokeWidth="0"/>
-          </svg>
-          <span style={{ color:'#fff', fontWeight:900, fontSize:19, letterSpacing:'-.5px' }}>howsitter</span>
-        </div>
-
-        {/* Links */}
-        <div style={{ display:'flex', alignItems:'center', gap:2 }}>
-          {[['view homes','/properties'],['find sitters','/sitters'],['how it works','/how-it-works'],['community','/community'],['corporate','/corporate']].map(([l,p])=>(
-            <button key={l} className="hs-nav-link" onClick={()=>nav(p)}
-              style={{ color:'rgba(255,255,255,.7)', padding:'8px 13px', fontSize:13.5, fontWeight:600, borderRadius:7 }}>{l}</button>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <div style={{ display:'flex', gap:10 }}>
-          <button className="hs-btn" onClick={()=>nav('/list-property')} style={{ background:'rgba(255,255,255,.1)', border:'1.5px solid rgba(255,255,255,.22)', color:'#fff', borderRadius:9, padding:'9px 18px', fontSize:13, fontWeight:700 }}>List my home</button>
-          <button className="hs-btn" onClick={()=>nav('/register')} style={{ background:G.y500, border:'none', color:G.g900, borderRadius:9, padding:'9px 20px', fontSize:13, fontWeight:900, boxShadow:'0 4px 14px rgba(245,166,35,.4)' }}>Sign up free</button>
-        </div>
-      </nav>
+ 
 
       {/* ══ HERO — Full-bleed with search overlay ══ */}
       <section style={{ position:'relative', height:640, overflow:'hidden' }}>
