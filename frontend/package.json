@@ -4,20 +4,27 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0",
+    "axios": "^1.13.5",
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.20.0",
-    "recharts": "^2.8.2"
+    "recharts": "^2.15.4"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/typography": "^0.5.19",
-    "@types/node": "^20.11.24",
+    "@types/leaflet": "^1.9.21",
+    "@types/leaflet.markercluster": "^1.5.6",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.2.0",

@@ -10,24 +10,31 @@ export const PROPERTY_TYPES = [
   'Apartment', 'House', 'Villa', 'Condo', 'Townhouse',
   'Cottage', 'Farmhouse', 'Penthouse', 'Studio', 'Loft'
 ];
-
+// constants.ts
 export const AMENITIES = [
   { id: 'wifi', label: 'WiFi', icon: 'fa-wifi' },
-  { id: 'parking', label: 'Parking', icon: 'fa-car' },
-  { id: 'pool', label: 'Swimming Pool', icon: 'fa-swimming-pool' },
+  { id: 'parking', label: 'Parking', icon: 'fa-parking' },
+  { id: 'pool', label: 'Pool', icon: 'fa-swimming-pool' },
   { id: 'gym', label: 'Gym', icon: 'fa-dumbbell' },
-  { id: 'garden', label: 'Garden', icon: 'fa-tree' },
   { id: 'ac', label: 'Air Conditioning', icon: 'fa-snowflake' },
   { id: 'heating', label: 'Heating', icon: 'fa-thermometer-half' },
-  { id: 'kitchen', label: 'Full Kitchen', icon: 'fa-utensils' },
-  { id: 'laundry', label: 'Laundry', icon: 'fa-t-shirt' },
-  { id: 'workspace', label: 'Workspace', icon: 'fa-laptop' },
+  { id: 'kitchen', label: 'Kitchen', icon: 'fa-utensils' },
+  { id: 'washer', label: 'Washer', icon: 'fa-soap' },
+  { id: 'dryer', label: 'Dryer', icon: 'fa-wind' },
   { id: 'tv', label: 'TV', icon: 'fa-tv' },
+  { id: 'garden', label: 'Garden', icon: 'fa-tree' },
   { id: 'bbq', label: 'BBQ Area', icon: 'fa-fire' },
+  { id: 'security', label: 'Security', icon: 'fa-shield-alt' },
+  { id: 'elevator', label: 'Elevator', icon: 'fa-elevator' },
+  { id: 'balcony', label: 'Balcony', icon: 'fa-building' },
 ];
 
 export const DURATION_OPTIONS = [
-  '1-2 weeks', '2-4 weeks', '1-3 months', '3-6 months', '6+ months'
+  { value: 30, label: '1 month' },
+  { value: 60, label: '2 months' },
+  { value: 90, label: '3 months' },
+  { value: 180, label: '6 months' },
+  { value: 365, label: '1 year' },
 ];
 
 export const FAQS = [

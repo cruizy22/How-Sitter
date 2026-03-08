@@ -1,61 +1,91 @@
-// src/services/api.ts - ENHANCED VERSION
+// src/services/api.ts - Updated with real Airbnb import
 const API_BASE_URL = 'http://localhost:5000/api';
 
 // Core Interfaces
+// src/services/api.ts
+
+export interface PropertyImage {
+  id: string;
+  image_url: string;
+  is_primary: boolean;
+  display_order?: number;
+}
+
+export interface PropertyDocument {
+  id: string;
+  document_type: string;
+  document_url: string;
+  verified: boolean;
+}
+
 export interface Property {
   id: string;
   title: string;
   description: string;
-  type: 'apartment' | 'house' | 'villa' | 'condo' | 'townhouse';
+  type: string;
   bedrooms: number;
   bathrooms: number;
+  location: string;
+  address?: string;
+  city: string;
+  country: string;
+  price_per_month: number;
+  security_deposit?: number;
+  status: string;
+  verification_status?: string;
+  amenities: string[];
+  images?: PropertyImage[];
+  primary_image?: string | null;
+  documents?: PropertyDocument[];
+  homeowner_name?: string;
+  homeowner_avatar?: string | null;
+  homeowner_country?: string;
+  homeowner_verified?: boolean;
+  homeowner_phone?: string;
+  homeowner_whatsapp?: string;
+  square_feet?: number | null;
+  min_stay_days?: number;
+  max_stay_days?: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  availability_start?: string;
+  availability_end?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PropertyDetail extends Property {
+  address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  availability_start?: string;
+  availability_end?: string;
+  house_rules?: string;
+  website_url?: string;
+  airbnb_url?: string;
+  virtual_tour_url?: string;
+  similarProperties?: SimilarProperty[];
+  homeowner_id?: string;
+  homeowner_email?: string;
+  homeowner_bio?: string;
+  homeowner_reviews?: {
+    total_reviews: number;
+    avg_rating: number;
+  };
+}
+
+export interface SimilarProperty {
+  id: string;
+  title: string;
   location: string;
   city: string;
   country: string;
   price_per_month: number;
-  security_deposit: number;
-  status: 'available' | 'occupied' | 'maintenance' | 'unavailable';
-  amenities: string[];
-  primary_image?: string;
-  homeowner_name: string;
-  homeowner_avatar?: string;
-  homeowner_country?: string;
-  homeowner_phone?: string;
-  square_feet?: number;
   min_stay_days?: number;
-  max_stay_days?: number;
-  homeowner_bio?: string;
-  latitude?: number;
-  longitude?: number;
+  primary_image?: string | null;
 }
 
-export interface PropertyImage {
-  id: number;
-  image_url: string;
-  is_primary: boolean;
-}
-
-export interface PropertyDetail extends Property {
-  images: PropertyImage[];
-  homeowner_bio: string;
-  homeowner_reviews: {
-    total_reviews: number;
-    avg_rating: number;
-  };
-  min_stay_days: number;
-  max_stay_days: number;
-  availability_start?: string;
-  availability_end?: string;
-  square_feet: number;
-  latitude: number;
-  longitude: number;
-  similarProperties: Property[];
-  created_at: string;
-  updated_at: string;
-  homeowner_id: string;
-  homeowner_email: string;
-}
-
+// In api.ts, update the Sitter interface
 export interface Sitter {
   id: string;
   user_id: string;
@@ -64,6 +94,7 @@ export interface Sitter {
   phone?: string;
   phone_number?: string;
   country: string;
+  city?: string;  // Add this line
   bio: string;
   avatar_url?: string;
   avatar?: string;
@@ -82,6 +113,14 @@ export interface Sitter {
   location?: string;
   response_rate?: number;
   response_time?: number;
+  preferred_duration?: string;
+  airbnb_verified?: boolean;
+  credit_score?: number;
+  bank_verified?: boolean;
+  linkedin_verified?: boolean;
+  transaction_count?: number;
+  whatsapp_number?: string;
+  min_credit_score?: number;
 }
 
 export interface SitterDetail extends Sitter {
@@ -108,10 +147,13 @@ export interface User {
   name: string;
   role: 'homeowner' | 'sitter' | 'admin';
   verified: boolean;
+  is_verified?: boolean;
   avatar_url?: string;
   phone?: string;
   country?: string;
   bio?: string;
+  whatsapp?: string;
+  created_at?: string;
 }
 
 export interface AuthResponse {
@@ -141,6 +183,7 @@ export interface Arrangement {
   end_date: string;
   status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
   total_amount: number;
+  monthly_amount: number;
   property_security_deposit?: number;
   security_deposit: number;
   message_count: number;
@@ -150,6 +193,9 @@ export interface Arrangement {
   sitter_country?: string;
   created_at: string;
   updated_at: string;
+  sitter_verification_status?: string;
+  transaction_count?: number;
+  whatsapp_number?: string;
 }
 
 export interface Message {
@@ -161,9 +207,245 @@ export interface Message {
   created_at: string;
 }
 
+export interface AirbnbImportResponse {
+  success: boolean;
+  data: {
+    title: string;
+    description: string;
+    type: string;
+    bedrooms: number;
+    bathrooms: number;
+    location: string;
+    city: string;
+    country: string;
+    price_per_month: number;
+    security_deposit: number;
+    amenities: string[];
+    square_feet: number | null;
+    images?: string[];
+    host_name?: string;
+    host_avatar?: string | null;
+    property_url: string;
+    source_platform: string;
+    source_url: string;
+    original_listing_id: string;
+  };
+  error?: string;
+}
+
+// Admin Interfaces
+export interface DashboardStats {
+  users: {
+    total: number;
+    homeowners: number;
+    sitters: number;
+    verified_users: number;
+    pending_verifications: number;
+  };
+  properties: {
+    total: number;
+    pending_approval: number;
+    pending_verification: number;
+    available: number;
+  };
+  arrangements: {
+    total: number;
+    pending: number;
+    active: number;
+    completed: number;
+  };
+  pending_requests: number;
+  recent_activities: Array<{ action_type: string; count: number }>;
+}
+
+export interface VerificationRequest {
+  id: string;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  user_role: string;
+  entity_type: 'user' | 'property' | 'sitter';
+  entity_id: string;
+  entity_name: string;
+  request_type: string;
+  status: string;
+  requested_data: any;
+  admin_notes: string;
+  reviewed_by: string;
+  reviewed_at: string;
+  created_at: string;
+}
+
+export interface AuditLog {
+  id: string;
+  admin_id: string;
+  admin_name: string;
+  admin_email: string;
+  action_type: string;
+  entity_type: string;
+  entity_id: string;
+  action_details: any;
+  ip_address: string;
+  user_agent: string;
+  created_at: string;
+}
+
+export interface SystemStats {
+  dailyRegistrations: Array<{ date: string; count: number }>;
+  roleDistribution: Array<{ role: string; count: number }>;
+  propertyTypes: Array<{ type: string; count: number }>;
+  monthlyRevenue: Array<{ month: string; revenue: number; bookings: number }>;
+  verificationStats: {
+    pending_users: number;
+    approved_users: number;
+    pending_properties: number;
+    approved_properties: number;
+  };
+}
+
+export interface AdminStats {
+  users: {
+    total: number;
+    homeowners: number;
+    sitters: number;
+    verified_users: number;
+    pending_verifications: number;
+    admins?: number;
+  };
+  properties: {
+    total: number;
+    pending_approval: number;
+    pending_verification: number;
+    available: number;
+  };
+  arrangements: {
+    total: number;
+    pending: number;
+    active: number;
+    completed: number;
+  };
+  pending_requests: number;
+  recent_activities: Array<{ action_type: string; count: number }>;
+}
+
+// Mock data for development when backend is empty
+const MOCK_PROPERTIES: Property[] = [
+  {
+    id: '1',
+    title: 'Luxury Villa with Pool',
+    description: 'Beautiful villa with stunning views and modern amenities. Perfect for long-term stays.',
+    type: 'villa',
+    bedrooms: 4,
+    bathrooms: 3,
+    location: 'Hollywood Hills',
+    city: 'Los Angeles',
+    country: 'USA',
+    price_per_month: 4500,
+    security_deposit: 1000,
+    status: 'available',
+    amenities: ['Pool', 'Garden', 'Gym', 'WiFi', 'Parking'],
+    primary_image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227',
+    homeowner_name: 'John Doe',
+    homeowner_avatar: 'https://ui-avatars.com/api/?name=John+Doe',
+    homeowner_country: 'USA',
+    min_stay_days: 30,
+    max_stay_days: 365,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: '2',
+    title: 'Cozy Downtown Apartment',
+    description: 'Modern apartment in the heart of the city with amazing views.',
+    type: 'apartment',
+    bedrooms: 2,
+    bathrooms: 1,
+    location: 'Downtown',
+    city: 'New York',
+    country: 'USA',
+    price_per_month: 2800,
+    security_deposit: 800,
+    status: 'available',
+    amenities: ['WiFi', 'Gym', 'Parking', 'AC'],
+    primary_image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
+    homeowner_name: 'Jane Smith',
+    homeowner_avatar: 'https://ui-avatars.com/api/?name=Jane+Smith',
+    homeowner_country: 'USA',
+    min_stay_days: 30,
+    max_stay_days: 365,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: '3',
+    title: 'Beachfront Paradise',
+    description: 'Stunning beachfront property with direct access to the beach.',
+    type: 'house',
+    bedrooms: 3,
+    bathrooms: 2,
+    location: 'Beach Road',
+    city: 'Miami',
+    country: 'USA',
+    price_per_month: 3500,
+    security_deposit: 900,
+    status: 'available',
+    amenities: ['Beach Access', 'Pool', 'Garden', 'WiFi'],
+    primary_image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
+    homeowner_name: 'Mike Johnson',
+    homeowner_avatar: 'https://ui-avatars.com/api/?name=Mike+Johnson',
+    homeowner_country: 'USA',
+    min_stay_days: 30,
+    max_stay_days: 365,
+    created_at: new Date().toISOString()
+  }
+];
+
+const MOCK_SITTERS: Sitter[] = [
+  {
+    id: '1',
+    user_id: '1',
+    name: 'Sarah Johnson',
+    email: 'sarah@example.com',
+    country: 'USA',
+    bio: 'Experienced house sitter with 5 years of experience. Love pets and plants!',
+    avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786',
+    rating: 4.9,
+    total_reviews: 24,
+    experience_years: 5,
+    credentials: ['Background Checked', 'Pet First Aid'],
+    skills: ['Pet Care', 'Gardening', 'Cleaning'],
+    languages: ['English', 'Spanish'],
+    is_available: true,
+    is_verified: true,
+    completed_arrangements: 18,
+    response_rate: 98,
+    response_time: 2
+  },
+  {
+    id: '2',
+    user_id: '2',
+    name: 'David Chen',
+    email: 'david@example.com',
+    country: 'Canada',
+    bio: 'Responsible and reliable sitter. Experience with luxury homes.',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
+    rating: 4.8,
+    total_reviews: 16,
+    experience_years: 3,
+    credentials: ['Background Checked', 'Security Certified'],
+    skills: ['Security', 'Maintenance', 'Communication'],
+    languages: ['English', 'Mandarin'],
+    is_available: true,
+    is_verified: true,
+    completed_arrangements: 12,
+    response_rate: 95,
+    response_time: 3
+  }
+];
+
+// ========== API SERVICE CLASS ==========
 class ApiService {
   private token: string | null = null;
 
+  // ========== TOKEN MANAGEMENT ==========
   setToken(token: string) {
     this.token = token;
     localStorage.setItem('token', token);
@@ -208,7 +490,7 @@ class ApiService {
     return response.json();
   }
 
-  // ========== Auth Endpoints ==========
+  // ========== AUTH ENDPOINTS ==========
   async register(userData: {
     email: string;
     password: string;
@@ -222,7 +504,24 @@ class ApiService {
       headers: this.getHeaders(),
       body: JSON.stringify(userData),
     });
-    return this.handleResponse<AuthResponse>(response);
+    
+    if (!response.ok) {
+      if (response.status === 409) {
+        throw new Error('Email already registered. Please use a different email or login.');
+      }
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.message || errorMessage;
+      } catch {
+        // If response is not JSON, use default message
+      }
+      throw new Error(errorMessage);
+    }
+    
+    const data = await this.handleResponse<AuthResponse>(response);
+    this.setToken(data.token);
+    return data;
   }
 
   async login(credentials: { email: string; password: string }): Promise<AuthResponse> {
@@ -264,7 +563,54 @@ class ApiService {
     return this.handleResponse<{ message: string }>(response);
   }
 
-  // ========== Property Endpoints ==========
+  // ========== AIRBNB IMPORT ENDPOINT - UPDATED TO USE REAL DATA ==========
+  async importFromAirbnb(airbnbUrl: string): Promise<AirbnbImportResponse> {
+    if (!airbnbUrl.includes('airbnb.com')) {
+      throw new Error('Please enter a valid Airbnb URL');
+    }
+
+    try {
+      console.log('Importing real Airbnb data from:', airbnbUrl);
+      
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('You must be logged in to import from Airbnb');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/real-listing/import`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ url: airbnbUrl })
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Session expired. Please login again.');
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Import failed (${response.status})`);
+        } else {
+          throw new Error(`Server error (${response.status}). Please try again.`);
+        }
+      }
+
+      const data = await response.json();
+      console.log('Airbnb import successful:', data);
+      return data;
+      
+    } catch (error) {
+      console.error('API importFromAirbnb error:', error);
+      throw error;
+    }
+  }
+
+  // ========== PROPERTY ENDPOINTS ==========
   async getProperties(params?: {
     page?: number;
     limit?: number;
@@ -275,6 +621,8 @@ class ApiService {
     bedrooms?: number;
     type?: string;
     search?: string;
+    status?: string;
+    minStayDays?: number;
   }): Promise<PaginatedResponse<Property>> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -286,113 +634,78 @@ class ApiService {
     }
 
     try {
+      console.log('Fetching properties from:', `${API_BASE_URL}/properties?${queryParams}`);
       const response = await fetch(`${API_BASE_URL}/properties?${queryParams}`);
+      
       if (!response.ok) {
-        // Fallback mock data for development
-        const mockProperties: Property[] = [
-          {
-            id: '1',
-            title: 'Luxury Villa with Pool',
-            description: 'Beautiful villa with stunning views and modern amenities',
-            type: 'villa',
-            bedrooms: 4,
-            bathrooms: 3,
-            location: 'Central District',
-            city: 'Singapore',
-            country: 'Singapore',
-            price_per_month: 4500,
-            security_deposit: 1000,
-            status: 'available',
-            amenities: ['Pool', 'Garden', 'Gym', 'AC'],
-            primary_image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227',
-            homeowner_name: 'John Doe',
-            homeowner_avatar: 'https://ui-avatars.com/api/?name=John+Doe',
-            homeowner_country: 'Singapore'
-          },
-          {
-            id: '2',
-            title: 'Modern Downtown Apartment',
-            description: 'Stylish apartment in the heart of the city',
-            type: 'apartment',
-            bedrooms: 2,
-            bathrooms: 2,
-            location: 'Downtown',
-            city: 'Kuala Lumpur',
-            country: 'Malaysia',
-            price_per_month: 1800,
-            security_deposit: 800,
-            status: 'available',
-            amenities: ['AC', 'Gym', 'Pool', 'Parking'],
-            primary_image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-            homeowner_name: 'Sarah Lee',
-            homeowner_avatar: 'https://ui-avatars.com/api/?name=Sarah+Lee',
-            homeowner_country: 'Malaysia'
-          },
-          {
-            id: '3',
-            title: 'Cozy Beach House',
-            description: 'Perfect getaway by the beach with ocean views',
-            type: 'house',
-            bedrooms: 3,
-            bathrooms: 2,
-            location: 'Beach Road',
-            city: 'Bali',
-            country: 'Indonesia',
-            price_per_month: 2200,
-            security_deposit: 600,
-            status: 'available',
-            amenities: ['Garden', 'BBQ', 'Beach Access', 'AC'],
-            primary_image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
-            homeowner_name: 'Michael Chen',
-            homeowner_avatar: 'https://ui-avatars.com/api/?name=Michael+Chen',
-            homeowner_country: 'Indonesia'
-          }
-        ];
-        
-        const filteredData = mockProperties.filter(property => {
-          if (params?.city && !property.city.toLowerCase().includes(params.city.toLowerCase())) return false;
-          if (params?.country && !property.country.toLowerCase().includes(params.country.toLowerCase())) return false;
-          if (params?.minPrice && property.price_per_month < params.minPrice) return false;
-          if (params?.maxPrice && property.price_per_month > params.maxPrice) return false;
-          if (params?.bedrooms && property.bedrooms < params.bedrooms) return false;
-          if (params?.type && property.type !== params.type) return false;
-          if (params?.search) {
-            const searchLower = params.search.toLowerCase();
-            if (!property.title.toLowerCase().includes(searchLower) &&
-                !property.description.toLowerCase().includes(searchLower) &&
-                !property.location.toLowerCase().includes(searchLower) &&
-                !property.city.toLowerCase().includes(searchLower) &&
-                !property.country.toLowerCase().includes(searchLower)) {
-              return false;
-            }
-          }
-          return true;
-        });
-
+        console.warn('API returned error, using mock data');
+        // Return mock data on error
         return {
-          data: filteredData,
+          data: MOCK_PROPERTIES,
           pagination: {
             page: params?.page || 1,
             limit: params?.limit || 12,
-            total: filteredData.length,
-            pages: Math.ceil(filteredData.length / (params?.limit || 12))
+            total: MOCK_PROPERTIES.length,
+            pages: Math.ceil(MOCK_PROPERTIES.length / (params?.limit || 12))
           }
         };
       }
       
       const backendData = await response.json();
+      console.log('Properties API response:', backendData);
       
-      return {
-        data: backendData.properties || [],
-        pagination: backendData.pagination || {
-          page: params?.page || 1,
-          limit: params?.limit || 12,
-          total: backendData.properties?.length || 0,
-          pages: Math.ceil((backendData.properties?.length || 0) / (params?.limit || 12))
-        }
-      };
+      // Handle your backend response format - which has { properties: [...], pagination: {...} }
+      if (backendData.properties && Array.isArray(backendData.properties)) {
+        return {
+          data: backendData.properties,
+          pagination: backendData.pagination || {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: backendData.properties.length,
+            pages: Math.ceil(backendData.properties.length / (params?.limit || 12))
+          }
+        };
+      } 
+      // Handle if response has data array directly
+      else if (backendData.data && Array.isArray(backendData.data)) {
+        return {
+          data: backendData.data,
+          pagination: backendData.pagination || {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: backendData.data.length,
+            pages: Math.ceil(backendData.data.length / (params?.limit || 12))
+          }
+        };
+      }
+      // Handle if response is just an array
+      else if (Array.isArray(backendData)) {
+        return {
+          data: backendData,
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: backendData.length,
+            pages: Math.ceil(backendData.length / (params?.limit || 12))
+          }
+        };
+      } 
+      // If no data, return empty array
+      else {
+        console.warn('No properties found in response, returning empty array');
+        return {
+          data: [],
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: 0,
+            pages: 0
+          }
+        };
+      }
     } catch (error) {
       console.error('API getProperties error:', error);
+      // Return empty array on error instead of mock data
       return {
         data: [],
         pagination: {
@@ -409,94 +722,12 @@ class ApiService {
     try {
       const response = await fetch(`${API_BASE_URL}/properties/${id}`);
       if (!response.ok) {
-        // Mock data for development
-        const mockPropertyDetail: PropertyDetail = {
-          id: id,
-          title: 'Luxury Villa with Pool',
-          description: 'Beautiful modern villa with stunning panoramic views, located in a quiet residential area. Perfect for long-term stays with all amenities provided.\n\nFeatures include:\n• 24/7 security\n• High-speed WiFi\n• Fully equipped kitchen\n• Laundry facilities\n• Private garden\n• Pool maintenance included',
-          type: 'villa',
-          bedrooms: 4,
-          bathrooms: 3,
-          location: 'Central District',
-          city: 'Singapore',
-          country: 'Singapore',
-          price_per_month: 4500,
-          security_deposit: 1000,
-          status: 'available',
-          amenities: ['Swimming Pool', 'Garden', 'Gym', 'AC', 'WiFi', 'Parking', 'Security', 'BBQ Area', 'Laundry', 'Kitchen'],
-          primary_image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227',
-          homeowner_name: 'John Doe',
-          homeowner_avatar: 'https://ui-avatars.com/api/?name=John+Doe&size=200',
-          homeowner_country: 'Singapore',
-          homeowner_phone: '+65 9123 4567',
-          square_feet: 3200,
-          min_stay_days: 30,
-          max_stay_days: 365,
-          homeowner_bio: 'I\'m a frequent traveler who enjoys sharing my beautiful home with responsible sitters. I\'ve been hosting for 5 years and love meeting people from around the world.',
-          latitude: 1.3521,
-          longitude: 103.8198,
-          homeowner_id: 'user_123',
-          homeowner_email: 'john.doe@example.com',
-          images: [
-            { id: 1, image_url: 'https://images.unsplash.com/photo-1613977257363-707ba9348227', is_primary: true },
-            { id: 2, image_url: 'https://images.unsplash.com/photo-1513584684374-8bab748fbf90', is_primary: false },
-            { id: 3, image_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00', is_primary: false }
-          ],
-          homeowner_reviews: {
-            total_reviews: 24,
-            avg_rating: 4.8
-          },
-          similarProperties: [
-            {
-              id: '2',
-              title: 'Modern Downtown Apartment',
-              description: 'Stylish apartment in the heart of the city',
-              type: 'apartment',
-              bedrooms: 2,
-              bathrooms: 2,
-              location: 'Downtown',
-              city: 'Kuala Lumpur',
-              country: 'Malaysia',
-              price_per_month: 1800,
-              security_deposit: 800,
-              status: 'available',
-              amenities: ['AC', 'Gym', 'Pool', 'Parking'],
-              primary_image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00',
-              homeowner_name: 'Sarah Lee',
-              homeowner_avatar: 'https://ui-avatars.com/api/?name=Sarah+Lee',
-              homeowner_country: 'Malaysia'
-            },
-            {
-              id: '3',
-              title: 'Cozy Beach House',
-              description: 'Perfect getaway by the beach with ocean views',
-              type: 'house',
-              bedrooms: 3,
-              bathrooms: 2,
-              location: 'Beach Road',
-              city: 'Bali',
-              country: 'Indonesia',
-              price_per_month: 2200,
-              security_deposit: 600,
-              status: 'available',
-              amenities: ['Garden', 'BBQ', 'Beach Access', 'AC'],
-              primary_image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
-              homeowner_name: 'Michael Chen',
-              homeowner_avatar: 'https://ui-avatars.com/api/?name=Michael+Chen',
-              homeowner_country: 'Indonesia'
-            }
-          ],
-          created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:30:00Z',
-          availability_start: '2024-02-01',
-          availability_end: '2024-12-31'
-        };
-        return mockPropertyDetail;
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       return this.handleResponse<PropertyDetail>(response);
     } catch (error) {
       console.error('API getPropertyDetail error:', error);
-      throw new Error('Failed to fetch property details');
+      throw error;
     }
   }
 
@@ -519,6 +750,10 @@ class ApiService {
     min_stay_days?: number;
     max_stay_days?: number;
     amenities?: string[];
+    rules?: string;
+    website_url?: string;
+    virtual_tour_url?: string;
+    airbnb_url?: string;
   }): Promise<{ propertyId: string; message: string }> {
     const response = await fetch(`${API_BASE_URL}/properties`, {
       method: 'POST',
@@ -564,7 +799,7 @@ class ApiService {
     return this.handleResponse<{ available: boolean; message?: string }>(response);
   }
 
-  // ========== Property Images ==========
+  // ========== PROPERTY IMAGES ==========
   async getPropertyImages(propertyId: string): Promise<{
     images: PropertyImage[];
   }> {
@@ -583,36 +818,7 @@ class ApiService {
     return this.handleResponse<{ propertyId: string }>(response);
   }
 
-  // ========== Property Reviews ==========
-  async getPropertyReviews(propertyId: string): Promise<{
-    reviews: Array<{
-      id: string;
-      rating: number;
-      comment: string;
-      reviewer_name: string;
-      reviewer_avatar?: string;
-      created_at: string;
-    }>;
-    average_rating: number;
-    total_reviews: number;
-  }> {
-    const response = await fetch(`${API_BASE_URL}/properties/${propertyId}/reviews`);
-    return this.handleResponse(response);
-  }
-
-  async addPropertyReview(propertyId: string, reviewData: {
-    rating: number;
-    comment: string;
-  }): Promise<{ reviewId: string; message: string }> {
-    const response = await fetch(`${API_BASE_URL}/properties/${propertyId}/reviews`, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: JSON.stringify(reviewData),
-    });
-    return this.handleResponse<{ reviewId: string; message: string }>(response);
-  }
-
-  // ========== Sitter Endpoints ==========
+  // ========== SITTER ENDPOINTS ==========
   async getSitters(params?: {
     page?: number;
     limit?: number;
@@ -623,124 +829,86 @@ class ApiService {
     experience?: number;
     languages?: string[];
     verified?: boolean;
+    search?: string;
+    min_credit_score?: number;
   }): Promise<PaginatedResponse<Sitter>> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
-          queryParams.append(key, value.toString());
+          // Handle array parameters
+          if (Array.isArray(value)) {
+            value.forEach(v => queryParams.append(key, v));
+          } else {
+            queryParams.append(key, value.toString());
+          }
         }
       });
     }
 
     try {
+      console.log('Fetching sitters from:', `${API_BASE_URL}/sitters?${queryParams}`);
       const response = await fetch(`${API_BASE_URL}/sitters?${queryParams}`);
+      
       if (!response.ok) {
-        // Mock data for development
-        const mockSitters: Sitter[] = [
-          {
-            id: '1',
-            user_id: 'user_1',
-            name: 'Sarah Johnson',
-            email: 'sarah@example.com',
-            phone: '+65 9123 4567',
-            country: 'Singapore',
-            bio: 'Experienced house sitter with 5 years of international experience. I love caring for properties and ensuring homeowners have peace of mind while they travel.',
-            avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786',
-            rating: 4.9,
-            avg_rating: 4.9,
-            total_reviews: 24,
-            experience_years: 5,
-            credentials: ['Background Checked', 'Pet First Aid', 'Property Management'],
-            skills: ['Gardening', 'Pet Care', 'Maintenance', 'Communication'],
-            languages: ['English', 'Mandarin', 'Spanish'],
-            is_available: true,
-            is_verified: true,
-            is_online: true,
-            total_sits: 18,
-            completed_arrangements: 18,
-            location: 'Singapore',
-            response_rate: 98,
-            response_time: 2
-          },
-          {
-            id: '2',
-            user_id: 'user_2',
-            name: 'David Chen',
-            email: 'david@example.com',
-            country: 'Malaysia',
-            bio: 'Digital nomad and responsible house sitter. I take pride in maintaining properties as if they were my own.',
-            avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
-            rating: 4.8,
-            avg_rating: 4.8,
-            total_reviews: 16,
-            experience_years: 3,
-            credentials: ['Background Checked', 'Reference Verified'],
-            skills: ['Tech Savvy', 'Cleaning', 'Security'],
-            languages: ['English', 'Mandarin', 'Malay'],
-            is_available: true,
-            is_verified: true,
-            completed_arrangements: 12,
-            location: 'Kuala Lumpur',
-            response_rate: 95,
-            response_time: 4
-          },
-          {
-            id: '3',
-            user_id: 'user_3',
-            name: 'Maria Rodriguez',
-            email: 'maria@example.com',
-            country: 'Spain',
-            bio: 'Professional house sitter specializing in long-term arrangements. I bring warmth and care to every home.',
-            avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80',
-            rating: 4.7,
-            avg_rating: 4.7,
-            total_reviews: 20,
-            experience_years: 7,
-            credentials: ['Background Checked', 'First Aid Certified', 'Pet Care Expert'],
-            skills: ['Gardening', 'Cooking', 'Organization'],
-            languages: ['Spanish', 'English', 'French'],
-            is_available: false,
-            is_verified: true,
-            completed_arrangements: 25,
-            location: 'Barcelona',
-            response_rate: 99,
-            response_time: 1
-          }
-        ];
-
-        const filteredData = mockSitters.filter(sitter => {
-          if (params?.location && !sitter.location?.toLowerCase().includes(params.location.toLowerCase())) return false;
-          if (params?.country && !sitter.country.toLowerCase().includes(params.country.toLowerCase())) return false;
-          if (params?.minRating && (sitter.rating || 0) < params.minRating) return false;
-          if (params?.available !== undefined && sitter.is_available !== params.available) return false;
-          if (params?.experience && (sitter.experience_years || 0) < params.experience) return false;
-          if (params?.verified && !sitter.is_verified) return false;
-          return true;
-        });
-
+        console.warn('Sitters API returned error, returning empty array');
         return {
-          data: filteredData,
+          data: [],
           pagination: {
             page: params?.page || 1,
             limit: params?.limit || 12,
-            total: filteredData.length,
-            pages: Math.ceil(filteredData.length / (params?.limit || 12))
+            total: 0,
+            pages: 0
           }
         };
       }
       
       const backendData = await response.json();
+      console.log('Sitters API response:', backendData);
       
-      return {
-        data: backendData.sitters || [],
-        pagination: backendData.pagination || {
-          page: params?.page || 1,
-          limit: params?.limit || 12,
-          total: backendData.sitters?.length || 0,
-          pages: Math.ceil((backendData.sitters?.length || 0) / (params?.limit || 12))
-        }
-      };
+      // Handle your backend response format - it returns { data: [...], pagination: {...} }
+      if (backendData.data && Array.isArray(backendData.data)) {
+        return {
+          data: backendData.data,
+          pagination: backendData.pagination || {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: backendData.data.length,
+            pages: Math.ceil(backendData.data.length / (params?.limit || 12))
+          }
+        };
+      } else if (backendData.sitters && Array.isArray(backendData.sitters)) {
+        return {
+          data: backendData.sitters,
+          pagination: backendData.pagination || {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: backendData.sitters.length,
+            pages: Math.ceil(backendData.sitters.length / (params?.limit || 12))
+          }
+        };
+      } else if (Array.isArray(backendData)) {
+        return {
+          data: backendData,
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: backendData.length,
+            pages: Math.ceil(backendData.length / (params?.limit || 12))
+          }
+        };
+      } else {
+        console.warn('No sitters found in response, returning empty array');
+        return {
+          data: [],
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 12,
+            total: 0,
+            pages: 0
+          }
+        };
+      }
     } catch (error) {
       console.error('API getSitters error:', error);
       return {
@@ -759,93 +927,189 @@ class ApiService {
     try {
       const response = await fetch(`${API_BASE_URL}/sitters/${id}`);
       if (!response.ok) {
-        // Mock data for development
-        const mockSitterDetail: SitterDetail = {
-          id: id,
-          user_id: 'user_1',
-          name: 'Sarah Johnson',
-          email: 'sarah@example.com',
-          phone: '+65 9123 4567',
-          phone_number: '+65 9123 4567',
-          country: 'Singapore',
-          bio: 'Experienced house sitter with 5 years of international experience across multiple countries. I have a passion for caring for homes and ensuring homeowners can travel with complete peace of mind. My approach is professional, communicative, and detail-oriented.',
-          avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786',
-          rating: 4.9,
-          avg_rating: 4.9,
-          total_reviews: 24,
-          experience_years: 5,
-          credentials: ['Background Checked', 'Pet First Aid Certified', 'Property Management Training', 'Reference Verified'],
-          skills: ['Gardening', 'Pet Care', 'Basic Maintenance', 'Communication', 'Organization', 'Cooking'],
-          languages: ['English', 'Mandarin', 'Spanish'],
-          is_available: true,
-          is_verified: true,
-          is_online: true,
-          total_sits: 18,
-          completed_arrangements: 18,
-          location: 'Singapore',
-          response_rate: 98,
-          response_time: 2,
-          reviews: [
-            {
-              id: '1',
-              rating: 5,
-              comment: 'Sarah was absolutely wonderful! She took excellent care of our home and pets. Communication was perfect throughout.',
-              reviewer_name: 'John M.',
-              reviewer_avatar: 'https://ui-avatars.com/api/?name=John+M',
-              created_at: '2024-01-15T10:30:00Z',
-              property_name: 'Family Home in Singapore',
-              location: 'Singapore'
-            },
-            {
-              id: '2',
-              rating: 5,
-              comment: 'Best house sitter we\'ve ever had. Left the house cleaner than we left it! Highly recommend.',
-              reviewer_name: 'Lisa T.',
-              reviewer_avatar: 'https://ui-avatars.com/api/?name=Lisa+T',
-              created_at: '2024-01-10T14:20:00Z',
-              property_name: 'Modern Apartment',
-              location: 'Singapore'
-            },
-            {
-              id: '3',
-              rating: 4,
-              comment: 'Sarah was reliable and professional. Good communication and house was well maintained.',
-              reviewer_name: 'Robert K.',
-              reviewer_avatar: 'https://ui-avatars.com/api/?name=Robert+K',
-              created_at: '2023-12-05T09:15:00Z',
-              property_name: 'Suburban Villa',
-              location: 'Singapore'
-            }
-          ],
-          experience: [
-            {
-              title: 'House Sitting Specialist',
-              description: 'Managed various property types including apartments, villas, and heritage homes',
-              duration: '5 years'
-            },
-            {
-              title: 'Pet Care Expert',
-              description: 'Experience with dogs, cats, birds, and small animals including special needs pets',
-              duration: '4 years'
-            },
-            {
-              title: 'Property Maintenance',
-              description: 'Basic maintenance, gardening, and emergency handling experience',
-              duration: '3 years'
-            }
-          ]
-        };
-        return mockSitterDetail;
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       return this.handleResponse<SitterDetail>(response);
     } catch (error) {
       console.error('API getSitterDetail error:', error);
-      throw new Error('Failed to fetch sitter details');
+      throw error;
     }
   }
 
-  // ========== Arrangement Endpoints ==========
+  // ========== SITTER FAVORITES ==========
+  async getFavoriteSitters(): Promise<PaginatedResponse<Sitter>> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        return { data: [], pagination: { page: 1, limit: 0, total: 0, pages: 1 } };
+      }
+
+      const response = await fetch(`${API_BASE_URL}/sitters/favorites`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log('Favorites endpoint not found, returning empty array');
+          return {
+            data: [],
+            pagination: {
+              page: 1,
+              limit: 0,
+              total: 0,
+              pages: 1
+            }
+          };
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Favorite sitters response:', data);
+      
+      // Handle your backend response format - it returns { data: [...], pagination: {...} }
+      if (data.data && Array.isArray(data.data)) {
+        return {
+          data: data.data,
+          pagination: data.pagination || {
+            page: 1,
+            limit: data.data.length,
+            total: data.data.length,
+            pages: 1
+          }
+        };
+      } else if (Array.isArray(data)) {
+        return {
+          data: data,
+          pagination: {
+            page: 1,
+            limit: data.length,
+            total: data.length,
+            pages: 1
+          }
+        };
+      } else {
+        return {
+          data: [],
+          pagination: {
+            page: 1,
+            limit: 0,
+            total: 0,
+            pages: 1
+          }
+        };
+      }
+    } catch (error) {
+      console.error('API getFavoriteSitters error:', error);
+      return {
+        data: [],
+        pagination: {
+          page: 1,
+          limit: 0,
+          total: 0,
+          pages: 1
+        }
+      };
+    }
+  }
+
+  async addFavoriteSitter(sitterId: string): Promise<{ message: string }> {
+    try {
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/sitters/${sitterId}/favorite`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return this.handleResponse<{ message: string }>(response);
+    } catch (error) {
+      console.error('API addFavoriteSitter error:', error);
+      throw error;
+    }
+  }
+
+  async removeFavoriteSitter(sitterId: string): Promise<{ message: string }> {
+    try {
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/sitters/${sitterId}/favorite`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return this.handleResponse<{ message: string }>(response);
+    } catch (error) {
+      console.error('API removeFavoriteSitter error:', error);
+      throw error;
+    }
+  }
+
+  // ========== SITTER PROFILE CREATION/UPDATE ==========
+  async createSitterProfile(formData: FormData): Promise<{ message: string; sitterId: string }> {
+    try {
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/sitters/profile`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to save profile' }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+      
+      return this.handleResponse<{ message: string; sitterId: string }>(response);
+    } catch (error) {
+      console.error('API createSitterProfile error:', error);
+      throw error;
+    }
+  }
+
+  // ========== SITTER EXPERIENCE ==========
+  async addSitterExperience(sitterId: string, experience: {
+    title: string;
+    description: string;
+    duration: string;
+  }): Promise<{ message: string; experienceId: string }> {
+    try {
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/sitters/${sitterId}/experience`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(experience)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return this.handleResponse<{ message: string; experienceId: string }>(response);
+    } catch (error) {
+      console.error('API addSitterExperience error:', error);
+      throw error;
+    }
+  }
+
+  // ========== ARRANGEMENT ENDPOINTS ==========
   async getArrangements(): Promise<{
     arrangements: Arrangement[];
   }> {
@@ -855,80 +1119,21 @@ class ApiService {
       });
       
       if (!response.ok) {
-        // Mock data for development
-        const mockArrangements: Arrangement[] = [
-          {
-            id: '1',
-            property_id: '1',
-            property_title: 'Luxury Villa with Pool',
-            location: 'Central District',
-            city: 'Singapore',
-            country: 'Singapore',
-            start_date: '2024-03-01',
-            end_date: '2024-03-31',
-            status: 'confirmed',
-            total_amount: 4500,
-            property_security_deposit: 1000,
-            security_deposit: 1000,
-            message_count: 12,
-            homeowner_name: 'John Doe',
-            homeowner_email: 'john@example.com',
-            sitter_name: 'Sarah Johnson',
-            sitter_country: 'Singapore',
-            created_at: '2024-02-15T10:30:00Z',
-            updated_at: '2024-02-20T14:45:00Z'
-          },
-          {
-            id: '2',
-            property_id: '2',
-            property_title: 'Modern Downtown Apartment',
-            location: 'Downtown',
-            city: 'Kuala Lumpur',
-            country: 'Malaysia',
-            start_date: '2024-04-15',
-            end_date: '2024-05-15',
-            status: 'pending',
-            total_amount: 1800,
-            property_security_deposit: 800,
-            security_deposit: 800,
-            message_count: 5,
-            homeowner_name: 'Sarah Lee',
-            homeowner_email: 'sarah@example.com',
-            sitter_name: 'David Chen',
-            sitter_country: 'Malaysia',
-            created_at: '2024-02-10T09:15:00Z',
-            updated_at: '2024-02-10T09:15:00Z'
-          },
-          {
-            id: '3',
-            property_id: '3',
-            property_title: 'Cozy Beach House',
-            location: 'Beach Road',
-            city: 'Bali',
-            country: 'Indonesia',
-            start_date: '2024-02-01',
-            end_date: '2024-02-28',
-            status: 'active',
-            total_amount: 2200,
-            property_security_deposit: 600,
-            security_deposit: 600,
-            message_count: 8,
-            homeowner_name: 'Michael Chen',
-            homeowner_email: 'michael@example.com',
-            sitter_name: 'Maria Rodriguez',
-            sitter_country: 'Spain',
-            created_at: '2024-01-25T11:20:00Z',
-            updated_at: '2024-01-30T16:10:00Z'
-          }
-        ];
-        
-        return { arrangements: mockArrangements };
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      return this.handleResponse<{ arrangements: Arrangement[] }>(response);
+      const data = await response.json();
+      
+      if (data.arrangements) {
+        return { arrangements: data.arrangements };
+      } else if (Array.isArray(data)) {
+        return { arrangements: data };
+      } else {
+        return { arrangements: [] };
+      }
     } catch (error) {
       console.error('API getArrangements error:', error);
-      return { arrangements: [] };
+      throw error;
     }
   }
 
@@ -941,7 +1146,7 @@ class ApiService {
     specialInstructions?: string;
   }): Promise<{ arrangementId: string; message: string; status: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/bookings`, {
+      const response = await fetch(`${API_BASE_URL}/arrangements`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify({
@@ -953,18 +1158,13 @@ class ApiService {
       });
       
       if (!response.ok) {
-        // Mock response for development
-        return {
-          arrangementId: `arr_${Date.now()}`,
-          message: 'Booking request created successfully',
-          status: 'pending'
-        };
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       return this.handleResponse<{ arrangementId: string; message: string; status: string }>(response);
     } catch (error) {
       console.error('API createArrangement error:', error);
-      throw new Error('Failed to create arrangement');
+      throw error;
     }
   }
 
@@ -977,17 +1177,36 @@ class ApiService {
       });
       
       if (!response.ok) {
-        return { message: 'Status updated successfully' };
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       return this.handleResponse<{ message: string }>(response);
     } catch (error) {
       console.error('API updateArrangementStatus error:', error);
-      throw new Error('Failed to update arrangement status');
+      throw error;
     }
   }
 
-  // ========== Message Endpoints ==========
+  // ========== SEND NOTICE TO VACATE ==========
+  async sendNoticeToVacate(arrangementId: string): Promise<{ message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/arrangements/${arrangementId}/notice-to-vacate`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return this.handleResponse<{ message: string }>(response);
+    } catch (error) {
+      console.error('API sendNoticeToVacate error:', error);
+      throw error;
+    }
+  }
+
+  // ========== MESSAGE ENDPOINTS ==========
   async getMessages(arrangementId: string): Promise<{
     messages: Message[];
   }> {
@@ -997,41 +1216,21 @@ class ApiService {
       });
       
       if (!response.ok) {
-        // Mock messages for development
-        const mockMessages: Message[] = [
-          {
-            id: '1',
-            sender_id: 'user_1',
-            sender_name: 'Sarah Johnson',
-            sender_avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786',
-            message: 'Hi John, I\'m interested in your villa for the month of March. Could you share more details about the property?',
-            created_at: '2024-02-15T10:30:00Z'
-          },
-          {
-            id: '2',
-            sender_id: 'user_2',
-            sender_name: 'John Doe',
-            sender_avatar: 'https://ui-avatars.com/api/?name=John+Doe',
-            message: 'Hello Sarah! I\'d be happy to provide more information. What would you like to know specifically?',
-            created_at: '2024-02-15T11:45:00Z'
-          },
-          {
-            id: '3',
-            sender_id: 'user_1',
-            sender_name: 'Sarah Johnson',
-            sender_avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786',
-            message: 'I was wondering about the pool maintenance schedule and if there are any specific house rules I should know about.',
-            created_at: '2024-02-15T14:20:00Z'
-          }
-        ];
-        
-        return { messages: mockMessages };
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      return this.handleResponse<{ messages: Message[] }>(response);
+      const data = await response.json();
+      
+      if (data.messages) {
+        return { messages: data.messages };
+      } else if (Array.isArray(data)) {
+        return { messages: data };
+      } else {
+        return { messages: [] };
+      }
     } catch (error) {
       console.error('API getMessages error:', error);
-      return { messages: [] };
+      throw error;
     }
   }
 
@@ -1057,12 +1256,12 @@ class ApiService {
   async sendArrangementMessage(arrangementId: string, message: string): Promise<{ messageId: string }> {
     return this.sendMessage({
       arrangementId,
-      receiverId: '', // Will be determined by backend
+      receiverId: '',
       message
     });
   }
 
-  // ========== Saved Properties ==========
+  // ========== SAVED PROPERTIES ==========
   async getSavedProperties(): Promise<PaginatedResponse<Property>> {
     try {
       const response = await fetch(`${API_BASE_URL}/saved-properties`, {
@@ -1070,6 +1269,32 @@ class ApiService {
       });
       
       if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.properties) {
+        return {
+          data: data.properties,
+          pagination: data.pagination || {
+            page: 1,
+            limit: data.properties.length,
+            total: data.properties.length,
+            pages: 1
+          }
+        };
+      } else if (Array.isArray(data)) {
+        return {
+          data: data,
+          pagination: {
+            page: 1,
+            limit: data.length,
+            total: data.length,
+            pages: 1
+          }
+        };
+      } else {
         return {
           data: [],
           pagination: {
@@ -1080,147 +1305,49 @@ class ApiService {
           }
         };
       }
-      
-      const data = await this.handleResponse<{ properties: Property[] }>(response);
-      return {
-        data: data.properties || [],
-        pagination: {
-          page: 1,
-          limit: data.properties?.length || 0,
-          total: data.properties?.length || 0,
-          pages: 1
-        }
-      };
     } catch (error) {
       console.error('API getSavedProperties error:', error);
-      return {
-        data: [],
-        pagination: {
-          page: 1,
-          limit: 0,
-          total: 0,
-          pages: 1
-        }
-      };
+      throw error;
     }
   }
 
   async saveProperty(propertyId: string): Promise<{ message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/properties/${propertyId}/save`, {
+      const response = await fetch(`${API_BASE_URL}/saved-properties/${propertyId}`, {
         method: 'POST',
         headers: this.getHeaders(),
       });
       
       if (!response.ok) {
-        return { message: 'Property saved successfully' };
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       return this.handleResponse<{ message: string }>(response);
     } catch (error) {
       console.error('API saveProperty error:', error);
-      throw new Error('Failed to save property');
+      throw error;
     }
   }
 
   async unsaveProperty(propertyId: string): Promise<{ message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/properties/${propertyId}/save`, {
+      const response = await fetch(`${API_BASE_URL}/saved-properties/${propertyId}`, {
         method: 'DELETE',
         headers: this.getHeaders(),
       });
       
       if (!response.ok) {
-        return { message: 'Property unsaved successfully' };
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       return this.handleResponse<{ message: string }>(response);
     } catch (error) {
       console.error('API unsaveProperty error:', error);
-      throw new Error('Failed to unsave property');
+      throw error;
     }
   }
 
-  // ========== Sitter Favorites ==========
-  async getFavoriteSitters(): Promise<PaginatedResponse<Sitter>> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sitters/favorites`, {
-        headers: this.getHeaders(),
-      });
-      
-      if (!response.ok) {
-        return {
-          data: [],
-          pagination: {
-            page: 1,
-            limit: 0,
-            total: 0,
-            pages: 1
-          }
-        };
-      }
-      
-      const data = await this.handleResponse<{ sitters: Sitter[] }>(response);
-      return {
-        data: data.sitters || [],
-        pagination: {
-          page: 1,
-          limit: data.sitters?.length || 0,
-          total: data.sitters?.length || 0,
-          pages: 1
-        }
-      };
-    } catch (error) {
-      console.error('API getFavoriteSitters error:', error);
-      return {
-        data: [],
-        pagination: {
-          page: 1,
-          limit: 0,
-          total: 0,
-          pages: 1
-        }
-      };
-    }
-  }
-
-  async addFavoriteSitter(sitterId: string): Promise<{ message: string }> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sitters/${sitterId}/favorite`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-      });
-      
-      if (!response.ok) {
-        return { message: 'Sitter added to favorites' };
-      }
-      
-      return this.handleResponse<{ message: string }>(response);
-    } catch (error) {
-      console.error('API addFavoriteSitter error:', error);
-      throw new Error('Failed to add favorite sitter');
-    }
-  }
-
-  async removeFavoriteSitter(sitterId: string): Promise<{ message: string }> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sitters/${sitterId}/favorite`, {
-        method: 'DELETE',
-        headers: this.getHeaders(),
-      });
-      
-      if (!response.ok) {
-        return { message: 'Sitter removed from favorites' };
-      }
-      
-      return this.handleResponse<{ message: string }>(response);
-    } catch (error) {
-      console.error('API removeFavoriteSitter error:', error);
-      throw new Error('Failed to remove favorite sitter');
-    }
-  }
-
-  // ========== User Profile ==========
+  // ========== USER PROFILE ==========
   async getProfile(): Promise<{
     user: User & {
       property_count?: number;
@@ -1238,34 +1365,13 @@ class ApiService {
       });
       
       if (!response.ok) {
-        // Mock profile for development
-        const mockProfile = {
-          user: {
-            id: 'user_1',
-            email: 'user@example.com',
-            name: 'John Doe',
-            role: 'sitter' as const,
-            verified: true,
-            avatar_url: 'https://ui-avatars.com/api/?name=John+Doe',
-            phone: '+65 9123 4567',
-            country: 'Singapore',
-            bio: 'Experienced traveler and house sitter'
-          },
-          property_count: 2,
-          sitter_profile: {
-            rating: 4.8,
-            total_reviews: 12,
-            experience_years: 3,
-            arrangement_count: 8
-          }
-        };
-        return mockProfile;
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       return this.handleResponse(response);
     } catch (error) {
       console.error('API getProfile error:', error);
-      throw new Error('Failed to fetch profile');
+      throw error;
     }
   }
 
@@ -1284,7 +1390,7 @@ class ApiService {
     return this.handleResponse<{ user: User; message: string }>(response);
   }
 
-  // ========== User Properties ==========
+  // ========== USER PROPERTIES ==========
   async getUserProperties(): Promise<Property[]> {
     const response = await fetch(`${API_BASE_URL}/user/properties`, {
       headers: this.getHeaders(),
@@ -1293,7 +1399,7 @@ class ApiService {
     return data.properties || [];
   }
 
-  // ========== Homeowner Profile ==========
+  // ========== HOMEOWNER PROFILE ==========
   async getHomeownerProfile(homeownerId: string): Promise<{
     id: string;
     name: string;
@@ -1310,7 +1416,7 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  // ========== Search Properties ==========
+  // ========== SEARCH PROPERTIES ==========
   async searchProperties(params?: {
     page?: number;
     limit?: number;
@@ -1330,43 +1436,68 @@ class ApiService {
     return this.getProperties(params);
   }
 
-  // ========== Search Sitters ==========
+  // ========== SEARCH SITTERS ==========
   async searchSitters(params?: {
     page?: number;
     limit?: number;
     location?: string;
+    country?: string;
     minRating?: number;
     experience?: number;
     languages?: string[];
     verified?: boolean;
     available?: boolean;
+    search?: string;
   }): Promise<PaginatedResponse<Sitter>> {
-    return this.getSitters(params);
+    return this.getSitters({
+      page: params?.page,
+      limit: params?.limit,
+      location: params?.location,
+      country: params?.country,
+      minRating: params?.minRating,
+      experience: params?.experience,
+      languages: params?.languages,
+      verified: params?.verified,
+      available: params?.available,
+      search: params?.search
+    });
   }
 
-  // ========== Health Check ==========
+  // ========== HEALTH CHECK ==========
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
     try {
       const response = await fetch(`${API_BASE_URL}/health`);
       return this.handleResponse<{ status: string; timestamp: string }>(response);
-    } catch {
-      return { status: 'healthy', timestamp: new Date().toISOString() };
+    } catch (error) {
+      console.error('API healthCheck error:', error);
+      throw error;
     }
   }
 
-  // ========== Utility Methods ==========
+  // ========== IMAGE UPLOAD ==========
   async uploadImage(file: File): Promise<{ url: string }> {
-    const formData = new FormData();
-    formData.append('image', file);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
 
-    const response = await fetch(`${API_BASE_URL}/upload`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.getToken()}`,
-      },
-      body: formData,
-    });
-    return this.handleResponse<{ url: string }>(response);
+      const response = await fetch(`${API_BASE_URL}/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.getToken()}`,
+        },
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        console.warn('Upload endpoint not available, continuing without image upload');
+        return { url: '' };
+      }
+      
+      return this.handleResponse<{ url: string }>(response);
+    } catch (error) {
+      console.warn('Image upload failed, continuing without image:', error);
+      return { url: '' };
+    }
   }
 
   async getNotifications(): Promise<{
@@ -1392,6 +1523,217 @@ class ApiService {
     });
     return this.handleResponse<{ message: string }>(response);
   }
+
+  // ========== ADMIN ENDPOINTS ==========
+  async getAdminStats(): Promise<DashboardStats> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/stats`, {
+        headers: this.getHeaders(),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return this.handleResponse<DashboardStats>(response);
+    } catch (error) {
+      console.error('API getAdminStats error:', error);
+      throw error;
+    }
+  }
+
+  async getAdminUsers(params?: { page?: number; limit?: number; role?: string }): Promise<PaginatedResponse<User>> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/users?${queryParams}`, {
+        headers: this.getHeaders(),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await this.handleResponse<any>(response);
+      
+      if (data.users) {
+        return {
+          data: data.users,
+          pagination: data.pagination || {
+            page: params?.page || 1,
+            limit: params?.limit || 20,
+            total: data.users.length,
+            pages: Math.ceil(data.users.length / (params?.limit || 20))
+          }
+        };
+      } else if (Array.isArray(data)) {
+        return {
+          data: data,
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 20,
+            total: data.length,
+            pages: Math.ceil(data.length / (params?.limit || 20))
+          }
+        };
+      } else {
+        return {
+          data: [],
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 20,
+            total: 0,
+            pages: 0
+          }
+        };
+      }
+    } catch (error) {
+      console.error('API getAdminUsers error:', error);
+      throw error;
+    }
+  }
+
+  async getAdminProperties(params?: { page?: number; limit?: number; status?: string }): Promise<PaginatedResponse<Property>> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/properties?${queryParams}`, {
+        headers: this.getHeaders(),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await this.handleResponse<any>(response);
+      
+      if (data.properties) {
+        return {
+          data: data.properties,
+          pagination: data.pagination || {
+            page: params?.page || 1,
+            limit: params?.limit || 20,
+            total: data.properties.length,
+            pages: Math.ceil(data.properties.length / (params?.limit || 20))
+          }
+        };
+      } else if (Array.isArray(data)) {
+        return {
+          data: data,
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 20,
+            total: data.length,
+            pages: Math.ceil(data.length / (params?.limit || 20))
+          }
+        };
+      } else {
+        return {
+          data: [],
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 20,
+            total: 0,
+            pages: 0
+          }
+        };
+      }
+    } catch (error) {
+      console.error('API getAdminProperties error:', error);
+      throw error;
+    }
+  }
+
+  async approveProperty(propertyId: string, notes?: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/properties/${propertyId}/approve`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ notes })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return await this.handleResponse<{ success: boolean; message: string }>(response);
+    } catch (error) {
+      console.error('❌ approveProperty error:', error);
+      throw error;
+    }
+  }
+
+  async rejectProperty(propertyId: string, reason: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/properties/${propertyId}/reject`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ reason })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return await this.handleResponse<{ success: boolean; message: string }>(response);
+    } catch (error) {
+      console.error('❌ rejectProperty error:', error);
+      throw error;
+    }
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, {
+        method: 'PATCH',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ role })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return await this.handleResponse<{ success: boolean; message: string }>(response);
+    } catch (error) {
+      console.error('❌ updateUserRole error:', error);
+      throw error;
+    }
+  }
+
+  async toggleUserSuspension(userId: string, action: 'suspend' | 'unsuspend', reason?: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/${action}`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({ reason })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return await this.handleResponse<{ success: boolean; message: string }>(response);
+    } catch (error) {
+      console.error('❌ toggleUserSuspension error:', error);
+      throw error;
+    }
+  }
 }
 
+// ========== EXPORT ==========
 export const api = new ApiService();

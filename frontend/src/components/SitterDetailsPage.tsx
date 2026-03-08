@@ -62,14 +62,10 @@ export const SitterDetailsPage: React.FC = () => {
 
     try {
       setBookingLoading(true);
-      // Since we don't have an arrangementId yet, we'll create a direct message
-      // In a real app, you might want to create an arrangement first or use a different endpoint
-      await api.sendMessage({
-        arrangementId: `temp_${Date.now()}_${sitter?.id}`, // Temporary arrangement ID
-        receiverId: sitter?.id || '', // Sitter's user ID
-        message: message.trim()
-      });
-      alert('Message sent successfully!');
+      
+      // For now, just alert that this feature is coming
+      alert('Message feature coming soon! For now, use WhatsApp to contact the sitter.');
+      
       setMessage('');
     } catch (err: any) {
       console.error('Error sending message:', err);
@@ -99,7 +95,6 @@ export const SitterDetailsPage: React.FC = () => {
     }
   };
 
-  // Format date for display
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
@@ -114,10 +109,10 @@ export const SitterDetailsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading sitter details...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading sitter details...</p>
         </div>
       </div>
     );
@@ -125,7 +120,7 @@ export const SitterDetailsPage: React.FC = () => {
 
   if (error || !sitter) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center max-w-md">
           <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
             <i className="fas fa-user-slash text-red-500 text-3xl"></i>
@@ -135,15 +130,15 @@ export const SitterDetailsPage: React.FC = () => {
           <div className="space-y-3">
             <button
               onClick={() => navigate('/sitters')}
-              className="w-full bg-primary hover:bg-primary-hover text-white px-6 py-3.5 rounded-lg font-semibold transition-all hover:shadow-lg"
+              className="w-full bg-gradient-to-r from-green-600 to-yellow-600 text-white px-6 py-3.5 rounded-xl font-bold transition-all hover:shadow-lg"
             >
               Browse Sitters
             </button>
             <button
               onClick={() => navigate('/')}
-              className="w-full border border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-3.5 rounded-lg font-semibold transition-colors"
+              className="w-full border border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-3.5 rounded-xl font-medium transition-colors"
             >
-              Return Home
+              Return to Home
             </button>
           </div>
         </div>
@@ -151,7 +146,6 @@ export const SitterDetailsPage: React.FC = () => {
     );
   }
 
-  // Calculate star rating display
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
@@ -161,13 +155,7 @@ export const SitterDetailsPage: React.FC = () => {
         {[...Array(5)].map((_, i) => (
           <i 
             key={i}
-            className={`fas fa-star ${
-              i < fullStars 
-                ? 'text-yellow-400' 
-                : i === fullStars && hasHalfStar 
-                  ? 'fas fa-star-half-alt text-yellow-400'
-                  : 'text-gray-300'
-            }`}
+            className={`fas fa-star ${i < fullStars ? 'text-yellow-400' : i === fullStars && hasHalfStar ? 'fas fa-star-half-alt text-yellow-400' : 'text-gray-300'}`}
           ></i>
         ))}
       </div>
@@ -175,9 +163,9 @@ export const SitterDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12 md:py-16">
+      <div className="bg-gradient-to-r from-green-600/10 to-yellow-600/10 py-12 md:py-16 border-b border-green-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
             {/* Avatar */}
@@ -193,7 +181,7 @@ export const SitterDetailsPage: React.FC = () => {
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-5xl md:text-6xl font-bold">
+                  <div className="w-full h-full bg-gradient-to-br from-green-600 to-yellow-600 flex items-center justify-center text-white text-5xl md:text-6xl font-bold">
                     {sitter.name.charAt(0)}
                   </div>
                 )}
@@ -201,11 +189,6 @@ export const SitterDetailsPage: React.FC = () => {
               {sitter.is_available && (
                 <div className="absolute -bottom-2 -right-2 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg">
                   Available Now
-                </div>
-              )}
-              {sitter.is_online && (
-                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                  Online
                 </div>
               )}
             </div>
@@ -224,12 +207,12 @@ export const SitterDetailsPage: React.FC = () => {
                   </div>
                   <div className="flex flex-wrap items-center text-gray-600 gap-3 mb-4">
                     <div className="flex items-center">
-                      <i className="fas fa-map-marker-alt mr-2 text-primary"></i>
+                      <i className="fas fa-map-marker-alt mr-2 text-green-600"></i>
                       <span>{sitter.location || sitter.country || 'Location not specified'}</span>
                     </div>
                     <span className="hidden md:inline">•</span>
                     <div className="flex items-center">
-                      <i className="fas fa-briefcase mr-2 text-primary"></i>
+                      <i className="fas fa-briefcase mr-2 text-green-600"></i>
                       <span>{sitter.experience_years || 0} years experience</span>
                     </div>
                   </div>
@@ -239,7 +222,7 @@ export const SitterDetailsPage: React.FC = () => {
                   className="p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-shadow self-start md:self-auto"
                   aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <i className={`fas fa-heart text-2xl ${isFavorite ? 'text-red-500 animate-pulse' : 'text-gray-300'}`}></i>
+                  <i className={`fas fa-heart text-2xl ${isFavorite ? 'text-red-500' : 'text-gray-300'}`}></i>
                 </button>
               </div>
 
@@ -262,7 +245,7 @@ export const SitterDetailsPage: React.FC = () => {
                   </span>
                 ))}
                 {sitter.credentials?.slice(0, 3).map((cred, idx) => (
-                  <span key={`cred-${idx}`} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                  <span key={`cred-${idx}`} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                     {cred}
                   </span>
                 ))}
@@ -280,21 +263,21 @@ export const SitterDetailsPage: React.FC = () => {
 
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="text-2xl font-bold text-primary text-center">{sitter.total_sits || sitter.completed_arrangements || 0}</div>
-                  <div className="text-gray-600 text-sm text-center">Total Sits</div>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200 hover:shadow-md transition-shadow">
+                  <div className="text-2xl font-bold text-green-600 text-center">{sitter.total_sits || sitter.completed_arrangements || 0}</div>
+                  <div className="text-gray-600 text-sm text-center">House Sits</div>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="text-2xl font-bold text-primary text-center">{sitter.experience_years || 0}</div>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-yellow-200 hover:shadow-md transition-shadow">
+                  <div className="text-2xl font-bold text-yellow-600 text-center">{sitter.experience_years || 0}</div>
                   <div className="text-gray-600 text-sm text-center">Years Experience</div>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="text-2xl font-bold text-primary text-center">{sitter.response_rate || 95}%</div>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-blue-200 hover:shadow-md transition-shadow">
+                  <div className="text-2xl font-bold text-blue-600 text-center">{sitter.response_rate || 95}%</div>
                   <div className="text-gray-600 text-sm text-center">Response Rate</div>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="text-2xl font-bold text-primary text-center">{sitter.response_time || 2}h</div>
-                  <div className="text-gray-600 text-sm text-center">Avg Response Time</div>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200 hover:shadow-md transition-shadow">
+                  <div className="text-2xl font-bold text-green-600 text-center">{sitter.response_time || 2}h</div>
+                  <div className="text-gray-600 text-sm text-center">Response Time</div>
                 </div>
               </div>
             </div>
@@ -308,17 +291,21 @@ export const SitterDetailsPage: React.FC = () => {
           {/* Left Column - Details */}
           <div className="lg:w-2/3">
             {/* Tabs */}
-            <div className="flex space-x-1 bg-white rounded-2xl p-1 border border-gray-200 mb-8 shadow-sm">
+            <div className="flex space-x-1 bg-white rounded-2xl p-1 border border-green-200 mb-8 shadow-sm">
               {['overview', 'reviews', 'availability'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`flex-1 px-6 py-3 rounded-xl font-bold transition-all duration-300 ${
                     activeTab === tab
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-gradient-to-r from-green-600 to-yellow-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-green-50'
                   }`}
                 >
+                  <i className={`fas ${
+                    tab === 'overview' ? 'fa-user' :
+                    tab === 'reviews' ? 'fa-star' : 'fa-calendar-alt'
+                  } mr-2`}></i>
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
               ))}
@@ -331,16 +318,16 @@ export const SitterDetailsPage: React.FC = () => {
                 <>
                   {/* Skills */}
                   {sitter.skills && sitter.skills.length > 0 && (
-                    <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+                    <div className="bg-white rounded-2xl p-8 border border-green-200 shadow-sm">
                       <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i className="fas fa-tools text-primary mr-3"></i>
+                        <i className="fas fa-tools text-green-600 mr-3"></i>
                         Skills & Expertise
                       </h2>
                       <div className="flex flex-wrap gap-3">
                         {sitter.skills.map((skill, idx) => (
                           <span
                             key={idx}
-                            className="px-4 py-2 bg-primary/10 text-primary rounded-full font-medium hover:bg-primary hover:text-white transition-colors cursor-default"
+                            className="px-4 py-2 bg-green-50 text-green-700 rounded-full font-medium hover:bg-green-100 transition-colors cursor-default border border-green-200"
                           >
                             {skill}
                           </span>
@@ -350,27 +337,29 @@ export const SitterDetailsPage: React.FC = () => {
                   )}
 
                   {/* Experience */}
-                  <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+                  <div className="bg-white rounded-2xl p-8 border border-green-200 shadow-sm">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                      <i className="fas fa-briefcase text-primary mr-3"></i>
-                      Experience
+                      <i className="fas fa-briefcase text-green-600 mr-3"></i>
+                      House Sitting Experience
                     </h2>
                     <div className="space-y-6">
-                      {sitter.experience?.map((exp, idx) => (
-                        <div key={idx} className="border-l-4 border-primary pl-6 py-2 hover:bg-gray-50 rounded-r-lg transition-colors">
-                          <h3 className="text-lg font-semibold text-gray-900">{exp.title}</h3>
-                          <p className="text-gray-600 mt-1">{exp.description}</p>
-                          <p className="text-sm text-gray-500 mt-2">
-                            <i className="fas fa-clock mr-1"></i>
-                            {exp.duration}
-                          </p>
-                        </div>
-                      )) || (
+                      {sitter.experience && sitter.experience.length > 0 ? (
+                        sitter.experience.map((exp, idx) => (
+                          <div key={idx} className="border-l-4 border-green-600 pl-6 py-4 hover:bg-green-50 rounded-r-xl transition-colors">
+                            <h3 className="text-lg font-bold text-gray-900">{exp.title}</h3>
+                            <p className="text-gray-600 mt-1">{exp.description}</p>
+                            <p className="text-sm text-gray-500 mt-2">
+                              <i className="fas fa-clock mr-1"></i>
+                              {exp.duration}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
                         <div className="text-center py-8">
                           <i className="fas fa-briefcase text-gray-300 text-4xl mb-4"></i>
                           <p className="text-gray-600">No specific experience listed.</p>
                           <p className="text-gray-500 text-sm mt-2">
-                            {sitter.name} has {sitter.experience_years || 0} years of overall experience
+                            {sitter.name} has {sitter.experience_years || 0} years of overall house sitting experience
                           </p>
                         </div>
                       )}
@@ -379,15 +368,15 @@ export const SitterDetailsPage: React.FC = () => {
 
                   {/* Credentials */}
                   {sitter.credentials && sitter.credentials.length > 0 && (
-                    <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+                    <div className="bg-white rounded-2xl p-8 border border-green-200 shadow-sm">
                       <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i className="fas fa-award text-primary mr-3"></i>
+                        <i className="fas fa-award text-green-600 mr-3"></i>
                         Credentials & Certifications
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {sitter.credentials.map((cred, idx) => (
-                          <div key={idx} className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-primary/5 transition-colors">
-                            <i className="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                          <div key={idx} className="flex items-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors border border-green-200">
+                            <i className="fas fa-check-circle text-green-600 text-xl mr-3"></i>
                             <span className="font-medium text-gray-700">{cred}</span>
                           </div>
                         ))}
@@ -399,22 +388,22 @@ export const SitterDetailsPage: React.FC = () => {
 
               {/* Reviews */}
               {activeTab === 'reviews' && (
-                <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+                <div className="bg-white rounded-2xl p-8 border border-green-200 shadow-sm">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i className="fas fa-star text-primary mr-3"></i>
+                    <i className="fas fa-star text-green-600 mr-3"></i>
                     Reviews ({sitter.total_reviews || 0})
                   </h2>
                   {sitter.reviews && sitter.reviews.length > 0 ? (
                     <div className="space-y-6">
                       {sitter.reviews.map((review, idx) => (
-                        <div key={idx} className="pb-6 border-b border-gray-100 last:border-0 last:pb-0 hover:bg-gray-50 rounded-lg p-4 transition-colors">
+                        <div key={idx} className="pb-6 border-b border-green-100 last:border-0 last:pb-0 hover:bg-green-50 rounded-lg p-4 transition-colors">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center">
-                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                                <i className="fas fa-user text-primary"></i>
+                              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                <i className="fas fa-user text-green-600"></i>
                               </div>
                               <div>
-                                <h4 className="font-semibold text-gray-900">{review.reviewer_name}</h4>
+                                <h4 className="font-bold text-gray-900">{review.reviewer_name}</h4>
                                 <p className="text-sm text-gray-600">{review.location}</p>
                               </div>
                             </div>
@@ -440,7 +429,7 @@ export const SitterDetailsPage: React.FC = () => {
                       <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                         <i className="fas fa-star text-gray-300 text-2xl"></i>
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No reviews yet</h3>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">No reviews yet</h3>
                       <p className="text-gray-600 max-w-md mx-auto">
                         {sitter.name} hasn't received any reviews yet. Be the first to work with them!
                       </p>
@@ -451,42 +440,31 @@ export const SitterDetailsPage: React.FC = () => {
 
               {/* Availability */}
               {activeTab === 'availability' && (
-                <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+                <div className="bg-white rounded-2xl p-8 border border-green-200 shadow-sm">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                    <i className="fas fa-calendar-alt text-primary mr-3"></i>
-                    Availability Calendar
+                    <i className="fas fa-calendar-alt text-green-600 mr-3"></i>
+                    Availability & Minimum Stay
                   </h2>
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                      <i className="fas fa-calendar-check text-primary text-2xl"></i>
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                      <i className="fas fa-calendar-check text-green-600 text-2xl"></i>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {sitter.is_available ? 'Available Now' : 'Currently Unavailable'}
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      {sitter.is_available ? 'Available for House Sitting' : 'Currently Unavailable'}
                     </h3>
-                    <p className="text-gray-600 mb-2 max-w-md mx-auto">
+                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
                       {sitter.is_available 
-                        ? `${sitter.name} is currently accepting new house sitting requests and is flexible with dates.`
+                        ? `${sitter.name} is currently accepting new house sitting arrangements with a minimum stay of 1 month.`
                         : `${sitter.name} is not currently available for new arrangements.`
                       }
                     </p>
-                    <p className="text-gray-500 text-sm">
-                      Contact {sitter.name} to discuss specific dates and availability
-                    </p>
-                  </div>
-                  
-                  {/* Quick Availability Status */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-                    <div className="text-center p-4 bg-gray-50 rounded-xl">
-                      <div className="text-sm font-medium text-gray-600 mb-1">Response Time</div>
-                      <div className="text-lg font-bold text-gray-900">{sitter.response_time || 2} hours</div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-xl">
-                      <div className="text-sm font-medium text-gray-600 mb-1">Response Rate</div>
-                      <div className="text-lg font-bold text-gray-900">{sitter.response_rate || 95}%</div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-xl">
-                      <div className="text-sm font-medium text-gray-600 mb-1">Flexibility</div>
-                      <div className="text-lg font-bold text-gray-900">High</div>
+                    
+                    <div className="bg-gradient-to-r from-green-50 to-yellow-50 p-6 rounded-xl border border-green-200 max-w-md mx-auto">
+                      <h4 className="font-bold text-green-800 mb-3">How Sitter Minimum Stay Policy</h4>
+                      <p className="text-green-700 text-sm">
+                        All house sitting arrangements require a <span className="font-bold">minimum 1-month stay</span>. 
+                        This ensures stability for homeowners and commitment from sitters.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -496,14 +474,32 @@ export const SitterDetailsPage: React.FC = () => {
 
           {/* Right Column - Contact Card */}
           <div className="lg:w-1/3">
-            <div className="sticky top-24 bg-white rounded-2xl border-2 border-gray-200 shadow-xl p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact {sitter.name}</h2>
+            <div className="sticky top-24 bg-white rounded-2xl border-2 border-green-200 shadow-xl p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-600 to-yellow-600 flex items-center justify-center">
+                  <i className="fas fa-home text-white text-lg"></i>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Contact {sitter.name}</h2>
+              </div>
               
+              {/* How Sitter Notice */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200">
+                <div className="flex items-start">
+                  <i className="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                  <div>
+                    <p className="text-sm font-bold text-blue-800">How Sitter Arrangement</p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      This is a house sitting arrangement, not a rental. First payment must use PayPal.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Date Selection */}
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className=".block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                    <i className="fas fa-calendar-alt mr-2 text-primary"></i>
+                  <label className="Block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                    <i className="fas fa-calendar-alt mr-2 text-green-600"></i>
                     Interested Dates (Optional)
                   </label>
                   <div className="space-y-3">
@@ -512,7 +508,7 @@ export const SitterDetailsPage: React.FC = () => {
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
                       />
                       {!startDate && (
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
@@ -526,11 +522,11 @@ export const SitterDetailsPage: React.FC = () => {
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         min={startDate}
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
                       />
                       {!endDate && (
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                          End date
+                          End date (min. 1 month)
                         </span>
                       )}
                     </div>
@@ -540,15 +536,15 @@ export const SitterDetailsPage: React.FC = () => {
 
               {/* Message */}
               <div className="mb-6">
-                <label className=".block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                  <i className="fas fa-comment-dots mr-2 text-primary"></i>
-                  Your Message *
+                <label className="Block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <i className="fas fa-comment-dots mr-2 text-green-600"></i>
+                  Your Message
                 </label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none transition-all"
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 resize-none transition-all"
                   placeholder="Tell them about your property and what you're looking for in a house sitter..."
                 />
                 <p className="text-xs text-gray-500 mt-2">
@@ -560,12 +556,12 @@ export const SitterDetailsPage: React.FC = () => {
               <div className="space-y-3">
                 <button
                   onClick={handleContact}
-                  disabled={bookingLoading || !message.trim()}
-                  className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-3.5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+                  disabled={bookingLoading}
+                  className="w-full bg-gradient-to-r from-green-600 to-yellow-600 hover:from-green-700 hover:to-yellow-700 text-white py-3.5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
                 >
                   {bookingLoading ? (
                     <span className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      <i className="fas fa-spinner fa-spin mr-2"></i>
                       Sending...
                     </span>
                   ) : (
@@ -575,7 +571,7 @@ export const SitterDetailsPage: React.FC = () => {
 
                 {/* WhatsApp Quick Contact */}
                 <a
-                  href={`https://wa.me/${sitter.phone_number || sitter.phone || '6588888888'}?text=Hi ${encodeURIComponent(sitter.name)}, I saw your profile on HouseSitter and would like to discuss a potential house sitting arrangement for my property.${startDate ? ` Dates: ${startDate} to ${endDate || 'flexible'}.` : ''}`}
+                  href={`https://wa.me/${sitter.phone_number || sitter.phone || '6588888888'}?text=Hi ${encodeURIComponent(sitter.name)}, I saw your profile on How Sitter and would like to discuss a potential house sitting arrangement for my property.${startDate ? ` Dates: ${startDate} to ${endDate || 'flexible'}.` : ''}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3.5 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
@@ -590,21 +586,21 @@ export const SitterDetailsPage: React.FC = () => {
                 <h3 className="font-bold text-gray-900 mb-4">Quick Response Guarantee</h3>
                 <div className="space-y-3">
                   <div className="flex items-center text-gray-600">
-                    <i className="fas fa-bolt text-primary mr-3 text-lg"></i>
+                    <i className="fas fa-bolt text-green-600 mr-3 text-lg"></i>
                     <div>
                       <p className="font-medium">Usually responds within</p>
                       <p className="text-sm text-gray-500">{sitter.response_time || 2} hours</p>
                     </div>
                   </div>
                   <div className="flex items-center text-gray-600">
-                    <i className="fas fa-percentage text-primary mr-3 text-lg"></i>
+                    <i className="fas fa-percentage text-green-600 mr-3 text-lg"></i>
                     <div>
                       <p className="font-medium">Response Rate</p>
                       <p className="text-sm text-gray-500">{sitter.response_rate || 95}% of messages</p>
                     </div>
                   </div>
                   <div className="flex items-center text-gray-600">
-                    <i className="fas fa-globe text-primary mr-3 text-lg"></i>
+                    <i className="fas fa-language text-green-600 mr-3 text-lg"></i>
                     <div>
                       <p className="font-medium">Languages</p>
                       <p className="text-sm text-gray-500">{sitter.languages?.join(', ') || 'English'}</p>
@@ -614,13 +610,13 @@ export const SitterDetailsPage: React.FC = () => {
               </div>
 
               {/* Safety Info */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-100">
                 <div className="flex items-start">
-                  <i className="fas fa-shield-alt text-blue-500 mt-1 mr-3"></i>
+                  <i className="fas fa-shield-alt text-blue-600 mt-1 mr-3"></i>
                   <div>
-                    <p className="text-sm font-medium text-blue-800">Secure Communication</p>
+                    <p className="text-sm font-bold text-blue-800">Secure Communication</p>
                     <p className="text-xs text-blue-600 mt-1">
-                      All messages are protected by our platform's security measures
+                      All How Sitter communications are protected. First payment via PayPal for buyer/seller protection.
                     </p>
                   </div>
                 </div>
@@ -631,19 +627,23 @@ export const SitterDetailsPage: React.FC = () => {
 
         {/* Similar Sitters */}
         <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Sitters You Might Like</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i className="fas fa-users text-green-600 mr-3"></i>
+            Similar Sitters
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* These would be populated from API */}
-            <div className="text-center p-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <i className="fas fa-user text-gray-400 text-2xl"></i>
+            <div className="text-center p-8 bg-white rounded-2xl border border-green-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-full flex items-center justify-center">
+                <i className="fas fa-user-check text-green-600 text-2xl"></i>
               </div>
-              <p className="text-gray-500">Find more sitters with similar experience</p>
+              <h4 className="font-bold text-gray-900 mb-2">Experienced Sitters</h4>
+              <p className="text-gray-600 text-sm mb-4">Browse our community of trusted sitters</p>
               <button
                 onClick={() => navigate('/sitters')}
-                className="mt-4 text-primary hover:text-primary-hover font-medium"
+                className="text-green-600 hover:text-green-700 font-bold flex items-center justify-center gap-2 mx-auto"
               >
-                Browse All Sitters →
+                Browse All Sitters
+                <i className="fas fa-arrow-right"></i>
               </button>
             </div>
           </div>

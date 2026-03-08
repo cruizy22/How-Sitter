@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { ToastProvider } from './components/Toast';
 import './styles/globals.css'; // Fixed path
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Add Font Awesome
 const fontAwesomeScript = document.createElement('script');
@@ -14,6 +15,7 @@ document.head.appendChild(fontAwesomeScript);
 const link = document.createElement('link');
 link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap';
 link.rel = 'stylesheet';
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></link>
 document.head.appendChild(link);
 
 // Add Clash Display Font (optional, if you want premium font)

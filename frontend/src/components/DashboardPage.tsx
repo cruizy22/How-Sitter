@@ -182,9 +182,14 @@ export const DashboardPage: React.FC = () => {
               <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile Settings</h3>
                 <p className="text-gray-600 mb-6">Update your profile, preferences, and availability</p>
-                <button className="w-full border border-gray-300 hover:border-gray-400 text-gray-700 py-3 rounded-lg font-semibold transition-colors">
+                // In the sitter section, replace the Profile Settings button with:
+
+                <Link
+                  to="/sitter-profile"
+                  className="block w-full text-center border border-gray-300 hover:border-gray-400 text-gray-700 py-3 rounded-lg font-semibold transition-colors"
+                >
                   Edit Profile
-                </button>
+                </Link>
               </div>
             </>
           )}
