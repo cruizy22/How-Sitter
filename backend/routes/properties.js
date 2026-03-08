@@ -1,21 +1,13 @@
+// backend/routes/properties.js - COMPLETELY REMOVED APPROVAL
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import pool from '../config/database.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
-
-// Database connection
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'howsitter',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -34,11 +26,24 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// Helper function to get full image URL
+const getFullImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http')) return imagePath;
+  
+  // Remove leading slash if present
+  const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
+  
+  // Return full URL (adjust port as needed)
+  return `http://localhost:5000/${cleanPath}`;
+};
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads/properties/';
-    // Create directory if it doesn't exist
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -53,10 +58,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
-    files: 10 // Max 10 files per upload
-  },
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -65,15 +67,212 @@ const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed (jpeg, jpg, png, gif, webp)'));
+      cb(new Error('Only image files are allowed'));
     }
   }
 });
 
-// ========== PROPERTY ROUTES ==========
+// ========== GET ALL PROPERTIES (with filtering) ==========
+router.get('/', async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 12,
+      city,
+      country,
+      minPrice,
+      maxPrice,
+      bedrooms,
+      type,
+      search,
+      minStayDays
+    } = req.query;
 
-// 1. CREATE PROPERTY (with images upload)
-router.post('/', verifyToken, upload.array('images', 10), async (req, res) => {
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    
+    // Only show properties that are available
+    let whereConditions = ["p.status = 'available'"];
+    let values = [];
+    let paramCount = 1;
+
+    if (city && city.trim() !== '') {
+      whereConditions.push(`p.city ILIKE $${paramCount}`);
+      values.push(`%${city}%`);
+      paramCount++;
+    }
+    
+    if (country && country.trim() !== '') {
+      whereConditions.push(`p.country ILIKE $${paramCount}`);
+      values.push(`%${country}%`);
+      paramCount++;
+    }
+    
+    if (minPrice && !isNaN(parseFloat(minPrice))) {
+      whereConditions.push(`p.price_per_month >= $${paramCount}`);
+      values.push(parseFloat(minPrice));
+      paramCount++;
+    }
+    
+    if (maxPrice && !isNaN(parseFloat(maxPrice))) {
+      whereConditions.push(`p.price_per_month <= $${paramCount}`);
+      values.push(parseFloat(maxPrice));
+      paramCount++;
+    }
+    
+    if (bedrooms && !isNaN(parseInt(bedrooms))) {
+      whereConditions.push(`p.bedrooms >= $${paramCount}`);
+      values.push(parseInt(bedrooms));
+      paramCount++;
+    }
+    
+    if (type && type.trim() !== '') {
+      whereConditions.push(`p.type = $${paramCount}`);
+      values.push(type);
+      paramCount++;
+    }
+    
+    if (minStayDays && !isNaN(parseInt(minStayDays))) {
+      whereConditions.push(`p.min_stay_days <= $${paramCount}`);
+      values.push(parseInt(minStayDays));
+      paramCount++;
+    }
+    
+    if (search && search.trim() !== '') {
+      whereConditions.push(`(
+        p.title ILIKE $${paramCount} OR 
+        p.description ILIKE $${paramCount} OR 
+        p.location ILIKE $${paramCount} OR 
+        p.city ILIKE $${paramCount} OR 
+        p.country ILIKE $${paramCount}
+      )`);
+      values.push(`%${search}%`);
+      paramCount++;
+    }
+
+    const whereClause = whereConditions.length > 0 
+      ? 'WHERE ' + whereConditions.join(' AND ') 
+      : '';
+
+    // Get properties with images
+    const propertiesQuery = `
+      SELECT 
+        p.*,
+        u.name as homeowner_name,
+        u.avatar_url as homeowner_avatar,
+        u.country as homeowner_country,
+        u.verified as homeowner_verified,
+        u.phone as homeowner_phone,
+        u.whatsapp as homeowner_whatsapp,
+        (
+          SELECT json_agg(amenity)
+          FROM property_amenities 
+          WHERE property_id = p.id
+        ) as amenities,
+        (
+          SELECT json_agg(
+            json_build_object(
+              'id', pi.id,
+              'image_url', pi.image_url,
+              'caption', pi.caption,
+              'is_primary', pi.is_primary,
+              'is_imported', pi.is_imported,
+              'display_order', pi.display_order
+            )
+            ORDER BY pi.display_order, pi.is_primary DESC
+          )
+          FROM property_images pi 
+          WHERE pi.property_id = p.id
+        ) as images
+      FROM properties p
+      LEFT JOIN users u ON p.homeowner_id = u.id
+      ${whereClause}
+      ORDER BY p.created_at DESC
+      LIMIT $${paramCount} OFFSET $${paramCount + 1}
+    `;
+
+    const queryParams = [...values, parseInt(limit), offset];
+    const propertiesResult = await pool.query(propertiesQuery, queryParams);
+
+    // Get total count
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM properties p
+      ${whereClause}
+    `;
+    
+    const countResult = await pool.query(countQuery, values);
+
+    // Process the results
+    const processedProperties = propertiesResult.rows.map(property => {
+      // Process images to full URLs
+      let images = property.images || [];
+      if (images.length > 0) {
+        images = images.map(img => ({
+          ...img,
+          image_url: getFullImageUrl(img.image_url)
+        }));
+      }
+      
+      // Get primary image
+      const primaryImage = images.find(img => img.is_primary)?.image_url || 
+                           images[0]?.image_url || null;
+      
+      return {
+        id: property.id,
+        title: property.title,
+        description: property.description,
+        type: property.type,
+        bedrooms: parseInt(property.bedrooms) || 1,
+        bathrooms: parseInt(property.bathrooms) || 1,
+        location: property.location,
+        address: property.address,
+        city: property.city,
+        country: property.country,
+        price_per_month: parseFloat(property.price_per_month) || 0,
+        security_deposit: parseFloat(property.security_deposit || 0),
+        status: property.status || 'available',
+        amenities: property.amenities || [],
+        images: images,
+        primary_image: primaryImage,
+        homeowner_name: property.homeowner_name || 'Homeowner',
+        homeowner_avatar: property.homeowner_avatar,
+        homeowner_country: property.homeowner_country,
+        homeowner_verified: property.homeowner_verified || false,
+        homeowner_phone: property.homeowner_phone,
+        homeowner_whatsapp: property.homeowner_whatsapp,
+        square_feet: property.square_feet ? parseInt(property.square_feet) : null,
+        min_stay_days: parseInt(property.min_stay_days) || 30,
+        max_stay_days: parseInt(property.max_stay_days) || 365,
+        latitude: property.latitude ? parseFloat(property.latitude) : null,
+        longitude: property.longitude ? parseFloat(property.longitude) : null,
+        availability_start: property.availability_start,
+        availability_end: property.availability_end,
+        created_at: property.created_at,
+        updated_at: property.updated_at
+      };
+    });
+
+    res.json({
+      data: processedProperties,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: parseInt(countResult.rows[0].total),
+        pages: Math.ceil(parseInt(countResult.rows[0].total) / parseInt(limit))
+      }
+    });
+
+  } catch (error) {
+    console.error('Get properties error:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch properties',
+      details: error.message 
+    });
+  }
+});
+
+// ========== CREATE PROPERTY ==========
+router.post('/', verifyToken, async (req, res) => {
   try {
     const {
       title,
@@ -82,6 +281,7 @@ router.post('/', verifyToken, upload.array('images', 10), async (req, res) => {
       bedrooms,
       bathrooms,
       location,
+      address,
       city,
       country,
       price_per_month,
@@ -90,11 +290,15 @@ router.post('/', verifyToken, upload.array('images', 10), async (req, res) => {
       square_feet,
       min_stay_days,
       max_stay_days,
-      rules,
-      website_url,
-      virtual_tour_url,
       latitude,
-      longitude
+      longitude,
+      availability_start,
+      availability_end,
+      website_url,
+      airbnb_url,
+      virtual_tour_url,
+      house_rules,
+      imported_images
     } = req.body;
 
     // Validate required fields
@@ -105,24 +309,26 @@ router.post('/', verifyToken, upload.array('images', 10), async (req, res) => {
     }
 
     // Check if user is a homeowner
-    if (req.user.role !== 'homeowner') {
+    if (req.user.role !== 'homeowner' && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Only homeowners can list properties' });
     }
 
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     
     try {
-      await connection.beginTransaction();
+      await client.query('BEGIN');
 
-      // Create property record
       const propertyId = uuidv4();
-      await connection.execute(
+      
+      // Insert property with status 'available'
+      await client.query(
         `INSERT INTO properties (
           id, homeowner_id, title, description, type, bedrooms, bathrooms, 
-          location, city, country, price_per_month, security_deposit,
-          square_feet, min_stay_days, max_stay_days, rules, website_url,
-          virtual_tour_url, latitude, longitude, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+          location, address, city, country, price_per_month, security_deposit,
+          square_feet, min_stay_days, max_stay_days, latitude, longitude,
+          availability_start, availability_end, website_url, airbnb_url,
+          virtual_tour_url, house_rules, status, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, NOW(), NOW())`,
         [
           propertyId,
           req.user.userId,
@@ -132,6 +338,7 @@ router.post('/', verifyToken, upload.array('images', 10), async (req, res) => {
           parseInt(bedrooms) || 1,
           parseInt(bathrooms) || 1,
           location,
+          address || null,
           city,
           country,
           parseFloat(price_per_month),
@@ -139,73 +346,102 @@ router.post('/', verifyToken, upload.array('images', 10), async (req, res) => {
           square_feet ? parseInt(square_feet) : null,
           parseInt(min_stay_days) || 30,
           parseInt(max_stay_days) || 365,
-          rules || '',
+          latitude ? parseFloat(latitude) : null,
+          longitude ? parseFloat(longitude) : null,
+          availability_start || null,
+          availability_end || null,
           website_url || null,
+          airbnb_url || null,
           virtual_tour_url || null,
-          latitude || null,
-          longitude || null
+          house_rules || null,
+          'available'
         ]
       );
 
       // Add amenities
-      let amenitiesArray = [];
-      if (amenities) {
-        if (typeof amenities === 'string') {
-          try {
-            amenitiesArray = JSON.parse(amenities);
-          } catch {
-            amenitiesArray = amenities.split(',').map(a => a.trim());
-          }
-        } else if (Array.isArray(amenities)) {
-          amenitiesArray = amenities;
-        }
-
-        for (const amenity of amenitiesArray) {
-          if (amenity.trim()) {
-            await connection.execute(
-              'INSERT INTO property_amenities (property_id, amenity) VALUES (?, ?)',
+      if (amenities && Array.isArray(amenities) && amenities.length > 0) {
+        for (const amenity of amenities) {
+          if (amenity && amenity.trim()) {
+            await client.query(
+              'INSERT INTO property_amenities (property_id, amenity) VALUES ($1, $2)',
               [propertyId, amenity.trim()]
             );
           }
         }
       }
 
-      // Handle image uploads
-      if (req.files && req.files.length > 0) {
-        for (let i = 0; i < req.files.length; i++) {
-          const file = req.files[i];
+      // Add imported images if they exist
+      if (imported_images && Array.isArray(imported_images) && imported_images.length > 0) {
+        console.log(`Saving ${imported_images.length} imported images for property ${propertyId}`);
+        
+        for (let i = 0; i < imported_images.length; i++) {
+          const img = imported_images[i];
           const imageId = uuidv4();
-          const imagePath = `/uploads/properties/${file.filename}`;
           
-          await connection.execute(
-            `INSERT INTO property_images (
-              id, property_id, image_url, display_order, is_primary, uploaded_at
-            ) VALUES (?, ?, ?, ?, ?, NOW())`,
-            [
-              imageId,
-              propertyId,
-              imagePath,
-              i,
-              i === 0 ? 1 : 0 // First image is primary
-            ]
-          );
+          // Extract image data
+          let imageUrl = '';
+          let caption = `Property image ${i + 1}`;
+          let isPrimary = i === 0;
+          
+          if (typeof img === 'string') {
+            imageUrl = img;
+          } else {
+            imageUrl = img.url || img.imageUrl || img.pictureUrl || '';
+            caption = img.caption || caption;
+            isPrimary = img.isPrimary || i === 0;
+          }
+          
+          // Ensure URL is absolute
+          if (imageUrl && !imageUrl.startsWith('http')) {
+            imageUrl = `https:${imageUrl}`;
+          }
+          
+          if (imageUrl) {
+            try {
+              // Insert with all available columns
+              await client.query(
+                `INSERT INTO property_images (
+                  id, property_id, image_url, caption, is_primary, 
+                  is_imported, original_url, display_order, created_at, updated_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())`,
+                [
+                  imageId,
+                  propertyId,
+                  imageUrl,
+                  caption,
+                  isPrimary,
+                  true, // is_imported
+                  imageUrl, // original_url
+                  i // display_order
+                ]
+              );
+              console.log(`  ✅ Saved imported image ${i + 1}: ${imageUrl.substring(0, 50)}...`);
+            } catch (err) {
+              console.error(`  ❌ Failed to save image ${i + 1}:`, err.message);
+              // Continue with other images even if one fails
+            }
+          }
         }
       }
 
-      await connection.commit();
+      await client.query('COMMIT');
+
+      // Get count of total images
+      const imageCount = imported_images ? imported_images.length : 0;
 
       res.status(201).json({
-        message: 'Property listed successfully and is pending verification',
+        success: true,
+        message: 'Property listed successfully and is now available for sitters!',
         propertyId: propertyId,
-        status: 'pending',
-        images: req.files ? req.files.length : 0
+        status: 'available',
+        images: imageCount
       });
 
     } catch (error) {
-      await connection.rollback();
+      await client.query('ROLLBACK');
       throw error;
     } finally {
-      connection.release();
+      client.release();
     }
 
   } catch (error) {
@@ -217,92 +453,12 @@ router.post('/', verifyToken, upload.array('images', 10), async (req, res) => {
   }
 });
 
-// 2. GET ALL PROPERTIES (with filtering)
-router.get('/', async (req, res) => {
+// ========== GET SINGLE PROPERTY DETAILS ==========
+router.get('/:id', async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 12,
-      city,
-      country,
-      min_price,
-      max_price,
-      min_bedrooms,
-      max_bedrooms,
-      property_type,
-      amenities,
-      min_stay,
-      max_stay,
-      search,
-      status = 'available' // Default to available properties
-    } = req.query;
+    const { id } = req.params;
 
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-    
-    let whereClauses = ['p.status = ?'];
-    let params = [status];
-    let paramCount = 1;
-
-    // Build dynamic WHERE clause based on filters
-    if (city) {
-      whereClauses.push(`p.city LIKE ?`);
-      params.push(`%${city}%`);
-    }
-    
-    if (country) {
-      whereClauses.push(`p.country LIKE ?`);
-      params.push(`%${country}%`);
-    }
-    
-    if (min_price) {
-      whereClauses.push(`p.price_per_month >= ?`);
-      params.push(parseFloat(min_price));
-    }
-    
-    if (max_price) {
-      whereClauses.push(`p.price_per_month <= ?`);
-      params.push(parseFloat(max_price));
-    }
-    
-    if (min_bedrooms) {
-      whereClauses.push(`p.bedrooms >= ?`);
-      params.push(parseInt(min_bedrooms));
-    }
-    
-    if (max_bedrooms) {
-      whereClauses.push(`p.bedrooms <= ?`);
-      params.push(parseInt(max_bedrooms));
-    }
-    
-    if (property_type) {
-      whereClauses.push(`p.type = ?`);
-      params.push(property_type);
-    }
-    
-    if (min_stay) {
-      whereClauses.push(`p.min_stay_days >= ?`);
-      params.push(parseInt(min_stay));
-    }
-    
-    if (max_stay) {
-      whereClauses.push(`p.max_stay_days <= ?`);
-      params.push(parseInt(max_stay));
-    }
-    
-    if (search) {
-      whereClauses.push(`(
-        p.title LIKE ? OR 
-        p.description LIKE ? OR 
-        p.location LIKE ? OR 
-        p.city LIKE ? OR 
-        p.country LIKE ?
-      )`);
-      const searchParam = `%${search}%`;
-      params.push(searchParam, searchParam, searchParam, searchParam, searchParam);
-    }
-
-    // Base query
-    const baseQuery = `
+    const propertyResult = await pool.query(`
       SELECT 
         p.*,
         u.name as homeowner_name,
@@ -310,228 +466,142 @@ router.get('/', async (req, res) => {
         u.country as homeowner_country,
         u.bio as homeowner_bio,
         u.avatar_url as homeowner_avatar,
-        GROUP_CONCAT(DISTINCT pa.amenity) as amenities_list,
+        u.phone as homeowner_phone,
+        u.whatsapp as homeowner_whatsapp,
+        u.verified as homeowner_verified,
         (
-          SELECT pi.image_url 
-          FROM property_images pi 
-          WHERE pi.property_id = p.id AND pi.is_primary = 1 
-          LIMIT 1
-        ) as primary_image,
-        (
-          SELECT COUNT(DISTINCT pi.id) 
+          SELECT json_agg(
+            json_build_object(
+              'id', pi.id,
+              'image_url', pi.image_url,
+              'caption', pi.caption,
+              'is_primary', pi.is_primary,
+              'is_imported', pi.is_imported,
+              'display_order', pi.display_order
+            )
+            ORDER BY pi.display_order, pi.is_primary DESC
+          )
           FROM property_images pi 
           WHERE pi.property_id = p.id
-        ) as image_count,
+        ) as images,
         (
-          SELECT COUNT(DISTINCT r.id) 
-          FROM reviews r 
-          WHERE r.property_id = p.id
-        ) as review_count,
-        (
-          SELECT AVG(r.rating) 
-          FROM reviews r 
-          WHERE r.property_id = p.id
-        ) as average_rating
+          SELECT json_agg(amenity)
+          FROM property_amenities 
+          WHERE property_id = p.id
+        ) as amenities
       FROM properties p
       LEFT JOIN users u ON p.homeowner_id = u.id
-      LEFT JOIN property_amenities pa ON p.id = pa.property_id
-      WHERE ${whereClauses.join(' AND ')}
-      GROUP BY p.id
-      ORDER BY p.created_at DESC
-      LIMIT ? OFFSET ?
-    `;
+      WHERE p.id = $1
+    `, [id]);
 
-    // Count query
-    const countQuery = `
-      SELECT COUNT(DISTINCT p.id) as total
-      FROM properties p
-      LEFT JOIN property_amenities pa ON p.id = pa.property_id
-      WHERE ${whereClauses.join(' AND ')}
-    `;
-
-    // Add limit and offset to params
-    const queryParams = [...params, parseInt(limit), offset];
-    const countParams = params;
-
-    // Execute queries
-    const [properties] = await pool.execute(baseQuery, queryParams);
-    const [countResult] = await pool.execute(countQuery, countParams);
-    
-    const total = countResult[0]?.total || 0;
-
-    // Process amenities list
-    const processedProperties = properties.map(property => {
-      const amenities = property.amenities_list ? property.amenities_list.split(',') : [];
-      delete property.amenities_list;
-      
-      return {
-        ...property,
-        amenities,
-        price_per_month: parseFloat(property.price_per_month),
-        security_deposit: parseFloat(property.security_deposit),
-        average_rating: property.average_rating ? parseFloat(property.average_rating) : 0
-      };
-    });
-
-    // Handle amenities filter after main query (for complex OR conditions)
-    let filteredProperties = processedProperties;
-    if (amenities) {
-      const amenityList = amenities.split(',').map(a => a.trim());
-      filteredProperties = processedProperties.filter(property => {
-        return amenityList.every(amenity => property.amenities.includes(amenity));
-      });
-    }
-
-    res.json({
-      properties: filteredProperties,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: filteredProperties.length, // Use filtered count
-        pages: Math.ceil(filteredProperties.length / parseInt(limit))
-      },
-      filters: {
-        city,
-        country,
-        min_price,
-        max_price,
-        min_bedrooms,
-        max_bedrooms,
-        property_type,
-        amenities: amenities ? amenities.split(',') : null,
-        min_stay,
-        max_stay,
-        search
-      }
-    });
-
-  } catch (error) {
-    console.error('Get properties error:', error);
-    res.status(500).json({ error: 'Failed to fetch properties' });
-  }
-});
-
-// 3. GET SINGLE PROPERTY DETAILS
-router.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Get property details
-    const [properties] = await pool.execute(
-      `SELECT 
-        p.*,
-        u.name as homeowner_name,
-        u.email as homeowner_email,
-        u.country as homeowner_country,
-        u.bio as homeowner_bio,
-        u.avatar_url as homeowner_avatar,
-        u.phone as homeowner_phone,
-        (
-          SELECT COUNT(DISTINCT r.id) 
-          FROM reviews r 
-          WHERE r.reviewee_id = u.id AND r.role = 'homeowner'
-        ) as homeowner_total_reviews,
-        (
-          SELECT AVG(r.rating) 
-          FROM reviews r 
-          WHERE r.reviewee_id = u.id AND r.role = 'homeowner'
-        ) as homeowner_avg_rating,
-        (
-          SELECT COUNT(DISTINCT a.id) 
-          FROM arrangements a 
-          WHERE a.property_id = p.id AND a.status = 'completed'
-        ) as completed_arrangements
-      FROM properties p
-      JOIN users u ON p.homeowner_id = u.id
-      WHERE p.id = ?`,
-      [id]
-    );
-
-    if (properties.length === 0) {
+    if (propertyResult.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found' });
     }
 
-    const property = properties[0];
+    const property = propertyResult.rows[0];
+    
+    // Parse JSON fields
+    let images = property.images || [];
+    let amenities = property.amenities || [];
 
-    // Get amenities
-    const [amenities] = await pool.execute(
-      'SELECT amenity FROM property_amenities WHERE property_id = ?',
-      [id]
-    );
-    property.amenities = amenities.map(a => a.amenity);
+    // Process images to add full URLs
+    if (images.length > 0) {
+      images = images.map(img => ({
+        ...img,
+        image_url: getFullImageUrl(img.image_url)
+      }));
+    }
 
-    // Get images
-    const [images] = await pool.execute(
-      'SELECT * FROM property_images WHERE property_id = ? ORDER BY display_order, is_primary DESC',
-      [id]
-    );
-    property.images = images;
+    // Get primary image
+    const primaryImage = images.find(img => img.is_primary)?.image_url || 
+                         images[0]?.image_url || null;
 
-    // Get reviews for this property
-    const [reviews] = await pool.execute(
-      `SELECT 
-        r.*,
-        u.name as reviewer_name,
-        u.avatar_url as reviewer_avatar,
-        u.country as reviewer_country
-      FROM reviews r
-      JOIN users u ON r.reviewer_id = u.id
-      WHERE r.property_id = ?
-      ORDER BY r.created_at DESC
-      LIMIT 10`,
-      [id]
-    );
-    property.reviews = reviews;
-
-    // Get similar properties (same city/type, excluding current)
-    const [similarProperties] = await pool.execute(
-      `SELECT 
-        p.*,
-        u.name as homeowner_name,
-        u.country as homeowner_country,
+    // Get similar properties
+    const similarResult = await pool.query(`
+      SELECT 
+        p.id,
+        p.title,
+        p.location,
+        p.city,
+        p.country,
+        p.price_per_month,
+        p.min_stay_days,
         (
-          SELECT pi.image_url 
-          FROM property_images pi 
-          WHERE pi.property_id = p.id AND pi.is_primary = 1 
+          SELECT image_url 
+          FROM property_images 
+          WHERE property_id = p.id AND is_primary = true 
           LIMIT 1
-        ) as primary_image,
-        GROUP_CONCAT(DISTINCT pa.amenity) as amenities_list
+        ) as primary_image
       FROM properties p
-      JOIN users u ON p.homeowner_id = u.id
-      LEFT JOIN property_amenities pa ON p.id = pa.property_id
-      WHERE p.id != ? 
-        AND p.city = ? 
-        AND p.type = ? 
+      WHERE p.id != $1 
         AND p.status = 'available'
-      GROUP BY p.id
-      LIMIT 6`,
-      [id, property.city, property.type]
-    );
+        AND (p.city = $2 OR p.country = $3 OR p.type = $4)
+      LIMIT 4
+    `, [id, property.city, property.country, property.type]);
 
-    // Process amenities for similar properties
-    property.similarProperties = similarProperties.map(sp => {
-      const spAmenities = sp.amenities_list ? sp.amenities_list.split(',') : [];
-      delete sp.amenities_list;
-      
-      return {
-        ...sp,
-        amenities: spAmenities,
-        price_per_month: parseFloat(sp.price_per_month)
-      };
-    });
+    // Process similar properties images
+    const similarProperties = similarResult.rows.map(similar => ({
+      ...similar,
+      primary_image: getFullImageUrl(similar.primary_image)
+    }));
 
-    // Calculate total reviews and average rating
-    const totalReviews = property.reviews.length;
-    const avgRating = totalReviews > 0 
-      ? property.reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
-      : 0;
+    // Get homeowner reviews
+    const reviewsResult = await pool.query(`
+      SELECT 
+        COUNT(*) as total_reviews,
+        COALESCE(AVG(rating), 0) as avg_rating
+      FROM reviews
+      WHERE reviewee_id = $1
+    `, [property.homeowner_id]);
 
-    property.review_stats = {
-      total_reviews: totalReviews,
-      average_rating: avgRating.toFixed(1)
+    const processedProperty = {
+      id: property.id,
+      title: property.title,
+      description: property.description,
+      type: property.type,
+      bedrooms: parseInt(property.bedrooms) || 1,
+      bathrooms: parseInt(property.bathrooms) || 1,
+      location: property.location,
+      address: property.address,
+      city: property.city,
+      country: property.country,
+      price_per_month: parseFloat(property.price_per_month) || 0,
+      security_deposit: parseFloat(property.security_deposit || 0),
+      status: property.status || 'available',
+      amenities: amenities,
+      images: images,
+      primary_image: primaryImage,
+      square_feet: property.square_feet ? parseInt(property.square_feet) : null,
+      min_stay_days: parseInt(property.min_stay_days) || 30,
+      max_stay_days: parseInt(property.max_stay_days) || 365,
+      latitude: property.latitude ? parseFloat(property.latitude) : null,
+      longitude: property.longitude ? parseFloat(property.longitude) : null,
+      availability_start: property.availability_start,
+      availability_end: property.availability_end,
+      house_rules: property.house_rules,
+      website_url: property.website_url,
+      airbnb_url: property.airbnb_url,
+      virtual_tour_url: property.virtual_tour_url,
+      created_at: property.created_at,
+      updated_at: property.updated_at,
+      similarProperties: similarProperties,
+      // Homeowner info
+      homeowner_id: property.homeowner_id,
+      homeowner_name: property.homeowner_name || 'Homeowner',
+      homeowner_email: property.homeowner_email,
+      homeowner_country: property.homeowner_country,
+      homeowner_bio: property.homeowner_bio,
+      homeowner_avatar: getFullImageUrl(property.homeowner_avatar),
+      homeowner_phone: property.homeowner_phone,
+      homeowner_whatsapp: property.homeowner_whatsapp,
+      homeowner_verified: property.homeowner_verified || false,
+      homeowner_reviews: {
+        total_reviews: parseInt(reviewsResult.rows[0].total_reviews) || 0,
+        avg_rating: parseFloat(reviewsResult.rows[0].avg_rating) || 5.0
+      }
     };
 
-    res.json(property);
+    res.json(processedProperty);
 
   } catch (error) {
     console.error('Get property error:', error);
@@ -539,88 +609,156 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// 4. UPDATE PROPERTY
-router.put('/:id', verifyToken, async (req, res) => {
+// ========== UPLOAD PROPERTY IMAGES ==========
+router.post('/:id/images', verifyToken, upload.array('images', 10), async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const files = req.files;
 
-    // Check if property exists and user owns it
-    const [properties] = await pool.execute(
-      'SELECT homeowner_id FROM properties WHERE id = ?',
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: 'No images uploaded' });
+    }
+
+    // Check if property exists and belongs to user
+    const propertyCheck = await pool.query(
+      'SELECT homeowner_id FROM properties WHERE id = $1',
       [id]
     );
 
-    if (properties.length === 0) {
+    if (propertyCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found' });
     }
 
-    const property = properties[0];
-    
-    // Check ownership
-    if (property.homeowner_id !== req.user.userId && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'You can only update your own properties' });
+    if (propertyCheck.rows[0].homeowner_id !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'You do not have permission to upload images for this property' });
     }
 
-    // Build update query dynamically
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+
+      // Check if this is the first image (should be primary)
+      const existingImages = await client.query(
+        'SELECT COUNT(*) as count FROM property_images WHERE property_id = $1',
+        [id]
+      );
+      const isFirstImage = parseInt(existingImages.rows[0].count) === 0;
+
+      const imageResults = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const imageUrl = `/uploads/properties/${file.filename}`;
+        const isPrimary = isFirstImage && i === 0;
+        const displayOrder = parseInt(existingImages.rows[0].count) + i;
+
+        const result = await client.query(
+          `INSERT INTO property_images (
+            id, property_id, image_url, caption, is_primary, 
+            is_imported, display_order, created_at, updated_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) 
+          RETURNING id, image_url, caption, is_primary, display_order`,
+          [
+            uuidv4(), 
+            id, 
+            imageUrl, 
+            file.originalname, // caption
+            isPrimary, 
+            false, // is_imported
+            displayOrder
+          ]
+        );
+
+        imageResults.push(result.rows[0]);
+      }
+
+      await client.query('COMMIT');
+
+      // Return full URLs for the uploaded images
+      const imagesWithFullUrls = imageResults.map(img => ({
+        ...img,
+        image_url: getFullImageUrl(img.image_url)
+      }));
+
+      res.json({
+        success: true,
+        message: `${files.length} images uploaded successfully`,
+        images: imagesWithFullUrls
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+
+  } catch (error) {
+    console.error('Upload images error:', error);
+    res.status(500).json({ error: 'Failed to upload images' });
+  }
+});
+
+// ========== UPDATE PROPERTY ==========
+router.put('/:id', verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // Check if property exists and belongs to user
+    const propertyCheck = await pool.query(
+      'SELECT homeowner_id FROM properties WHERE id = $1',
+      [id]
+    );
+
+    if (propertyCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    if (propertyCheck.rows[0].homeowner_id !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'You do not have permission to update this property' });
+    }
+
+    // Build dynamic update query
     const allowedFields = [
       'title', 'description', 'type', 'bedrooms', 'bathrooms',
-      'location', 'city', 'country', 'price_per_month', 'security_deposit',
-      'square_feet', 'min_stay_days', 'max_stay_days', 'rules',
-      'website_url', 'virtual_tour_url', 'latitude', 'longitude', 'status'
+      'square_feet', 'location', 'address', 'city', 'country',
+      'price_per_month', 'security_deposit', 'min_stay_days', 'max_stay_days',
+      'latitude', 'longitude', 'availability_start', 'availability_end',
+      'house_rules', 'website_url', 'airbnb_url', 'virtual_tour_url', 'status'
     ];
 
-    const updates = [];
+    const updateFields = [];
     const values = [];
+    let paramIndex = 1;
 
     for (const field of allowedFields) {
-      if (updateData[field] !== undefined) {
-        updates.push(`${field} = ?`);
-        values.push(updateData[field]);
+      if (updates[field] !== undefined) {
+        updateFields.push(`${field} = $${paramIndex}`);
+        values.push(updates[field]);
+        paramIndex++;
       }
     }
 
-    if (updates.length === 0) {
+    if (updateFields.length === 0) {
       return res.status(400).json({ error: 'No valid fields to update' });
     }
 
-    updates.push('updated_at = NOW()');
     values.push(id);
+    const query = `
+      UPDATE properties 
+      SET ${updateFields.join(', ')}, updated_at = NOW()
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
 
-    const query = `UPDATE properties SET ${updates.join(', ')} WHERE id = ?`;
+    const result = await pool.query(query, values);
 
-    await pool.execute(query, values);
-
-    // Update amenities if provided
-    if (updateData.amenities !== undefined) {
-      // Delete existing amenities
-      await pool.execute('DELETE FROM property_amenities WHERE property_id = ?', [id]);
-      
-      // Add new amenities
-      let amenitiesArray = [];
-      if (typeof updateData.amenities === 'string') {
-        try {
-          amenitiesArray = JSON.parse(updateData.amenities);
-        } catch {
-          amenitiesArray = updateData.amenities.split(',').map(a => a.trim());
-        }
-      } else if (Array.isArray(updateData.amenities)) {
-        amenitiesArray = updateData.amenities;
-      }
-
-      for (const amenity of amenitiesArray) {
-        if (amenity.trim()) {
-          await pool.execute(
-            'INSERT INTO property_amenities (property_id, amenity) VALUES (?, ?)',
-            [id, amenity.trim()]
-          );
-        }
-      }
-    }
-
-    res.json({ 
+    res.json({
+      success: true,
       message: 'Property updated successfully',
-      propertyId: id
+      property: result.rows[0]
     });
 
   } catch (error) {
@@ -629,591 +767,36 @@ router.put('/:id', verifyToken, async (req, res) => {
   }
 });
 
-// 5. DELETE PROPERTY
+// ========== DELETE PROPERTY ==========
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if property exists and user owns it
-    const [properties] = await pool.execute(
-      'SELECT homeowner_id FROM properties WHERE id = ?',
+    // Check if property exists and belongs to user
+    const propertyCheck = await pool.query(
+      'SELECT homeowner_id FROM properties WHERE id = $1',
       [id]
     );
 
-    if (properties.length === 0) {
+    if (propertyCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found' });
     }
 
-    const property = properties[0];
-    
-    // Check ownership or admin
-    if (property.homeowner_id !== req.user.userId && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'You can only delete your own properties' });
+    if (propertyCheck.rows[0].homeowner_id !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'You do not have permission to delete this property' });
     }
 
-    // Check for active arrangements
-    const [arrangements] = await pool.execute(
-      `SELECT status FROM arrangements 
-       WHERE property_id = ? 
-       AND status IN ('pending', 'confirmed', 'active')`,
-      [id]
-    );
+    // Delete property (cascade will delete amenities and images)
+    await pool.query('DELETE FROM properties WHERE id = $1', [id]);
 
-    if (arrangements.length > 0) {
-      return res.status(400).json({ 
-        error: 'Cannot delete property with active or pending arrangements' 
-      });
-    }
-
-    const connection = await pool.getConnection();
-    
-    try {
-      await connection.beginTransaction();
-
-      // Delete associated records
-      await connection.execute('DELETE FROM property_amenities WHERE property_id = ?', [id]);
-      await connection.execute('DELETE FROM saved_properties WHERE property_id = ?', [id]);
-      await connection.execute('DELETE FROM property_images WHERE property_id = ?', [id]);
-      await connection.execute('DELETE FROM properties WHERE id = ?', [id]);
-
-      await connection.commit();
-
-      res.json({ message: 'Property deleted successfully' });
-
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
+    res.json({
+      success: true,
+      message: 'Property deleted successfully'
+    });
 
   } catch (error) {
     console.error('Delete property error:', error);
     res.status(500).json({ error: 'Failed to delete property' });
-  }
-});
-
-// 6. GET USER'S PROPERTIES
-router.get('/user/my-properties', verifyToken, async (req, res) => {
-  try {
-    const { page = 1, limit = 10, status } = req.query;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-    
-    let whereClause = 'homeowner_id = ?';
-    let params = [req.user.userId];
-    
-    if (status) {
-      whereClause += ' AND status = ?';
-      params.push(status);
-    }
-    
-    params.push(parseInt(limit), offset);
-
-    const [properties] = await pool.execute(
-      `SELECT 
-        p.*,
-        (
-          SELECT COUNT(DISTINCT a.id) 
-          FROM arrangements a 
-          WHERE a.property_id = p.id
-        ) as total_arrangements,
-        (
-          SELECT COUNT(DISTINCT a.id) 
-          FROM arrangements a 
-          WHERE a.property_id = p.id AND a.status = 'active'
-        ) as active_arrangements,
-        (
-          SELECT pi.image_url 
-          FROM property_images pi 
-          WHERE pi.property_id = p.id AND pi.is_primary = 1 
-          LIMIT 1
-        ) as primary_image
-      FROM properties p
-      WHERE ${whereClause}
-      ORDER BY p.created_at DESC
-      LIMIT ? OFFSET ?`,
-      params
-    );
-
-    // Get total count
-    const [countResult] = await pool.execute(
-      `SELECT COUNT(*) as total FROM properties WHERE ${whereClause}`,
-      params.slice(0, params.length - 2) // Remove limit and offset
-    );
-
-    const total = countResult[0]?.total || 0;
-
-    res.json({
-      properties,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / parseInt(limit))
-      }
-    });
-
-  } catch (error) {
-    console.error('Get user properties error:', error);
-    res.status(500).json({ error: 'Failed to fetch user properties' });
-  }
-});
-
-// 7. PROPERTY IMAGES MANAGEMENT
-router.post('/:id/images', verifyToken, upload.array('images', 10), async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Check if property exists and user owns it
-    const [properties] = await pool.execute(
-      'SELECT homeowner_id FROM properties WHERE id = ?',
-      [id]
-    );
-
-    if (properties.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = properties[0];
-    
-    if (property.homeowner_id !== req.user.userId) {
-      return res.status(403).json({ error: 'You can only add images to your own properties' });
-    }
-
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'No images provided' });
-    }
-
-    const connection = await pool.getConnection();
-    
-    try {
-      await connection.beginTransaction();
-
-      // Get current max display order
-      const [maxOrderResult] = await connection.execute(
-        'SELECT MAX(display_order) as max_order FROM property_images WHERE property_id = ?',
-        [id]
-      );
-      let currentOrder = maxOrderResult[0]?.max_order || -1;
-
-      const uploadedImages = [];
-
-      // Insert each image
-      for (let i = 0; i < req.files.length; i++) {
-        const file = req.files[i];
-        const imageId = uuidv4();
-        const imagePath = `/uploads/properties/${file.filename}`;
-        currentOrder++;
-
-        await connection.execute(
-          `INSERT INTO property_images (
-            id, property_id, image_url, display_order, uploaded_at
-          ) VALUES (?, ?, ?, ?, NOW())`,
-          [imageId, id, imagePath, currentOrder]
-        );
-
-        uploadedImages.push({
-          id: imageId,
-          image_url: imagePath,
-          display_order: currentOrder
-        });
-      }
-
-      await connection.commit();
-
-      res.status(201).json({
-        message: 'Images uploaded successfully',
-        images: uploadedImages,
-        count: uploadedImages.length
-      });
-
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
-
-  } catch (error) {
-    console.error('Upload property images error:', error);
-    res.status(500).json({ error: 'Failed to upload images' });
-  }
-});
-
-// 8. DELETE PROPERTY IMAGE
-router.delete('/:id/images/:imageId', verifyToken, async (req, res) => {
-  try {
-    const { id, imageId } = req.params;
-
-    // Check if property exists and user owns it
-    const [properties] = await pool.execute(
-      'SELECT homeowner_id FROM properties WHERE id = ?',
-      [id]
-    );
-
-    if (properties.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = properties[0];
-    
-    if (property.homeowner_id !== req.user.userId) {
-      return res.status(403).json({ error: 'You can only delete images from your own properties' });
-    }
-
-    // Get image info
-    const [images] = await pool.execute(
-      'SELECT image_url, is_primary FROM property_images WHERE id = ? AND property_id = ?',
-      [imageId, id]
-    );
-
-    if (images.length === 0) {
-      return res.status(404).json({ error: 'Image not found' });
-    }
-
-    const image = images[0];
-
-    // Check if trying to delete primary image
-    if (image.is_primary) {
-      return res.status(400).json({ error: 'Cannot delete primary image. Set another image as primary first.' });
-    }
-
-    // Delete image file from filesystem
-    const filePath = path.join(process.cwd(), image.image_url);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Delete from database
-    await pool.execute(
-      'DELETE FROM property_images WHERE id = ? AND property_id = ?',
-      [imageId, id]
-    );
-
-    res.json({ message: 'Image deleted successfully' });
-
-  } catch (error) {
-    console.error('Delete property image error:', error);
-    res.status(500).json({ error: 'Failed to delete image' });
-  }
-});
-
-// 9. SET PRIMARY IMAGE
-router.put('/:id/images/:imageId/primary', verifyToken, async (req, res) => {
-  try {
-    const { id, imageId } = req.params;
-
-    // Check if property exists and user owns it
-    const [properties] = await pool.execute(
-      'SELECT homeowner_id FROM properties WHERE id = ?',
-      [id]
-    );
-
-    if (properties.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = properties[0];
-    
-    if (property.homeowner_id !== req.user.userId) {
-      return res.status(403).json({ error: 'You can only update images of your own properties' });
-    }
-
-    // Check if image exists
-    const [images] = await pool.execute(
-      'SELECT id FROM property_images WHERE id = ? AND property_id = ?',
-      [imageId, id]
-    );
-
-    if (images.length === 0) {
-      return res.status(404).json({ error: 'Image not found' });
-    }
-
-    const connection = await pool.getConnection();
-    
-    try {
-      await connection.beginTransaction();
-
-      // Reset all images to non-primary
-      await connection.execute(
-        'UPDATE property_images SET is_primary = 0 WHERE property_id = ?',
-        [id]
-      );
-
-      // Set selected image as primary
-      await connection.execute(
-        'UPDATE property_images SET is_primary = 1 WHERE id = ? AND property_id = ?',
-        [imageId, id]
-      );
-
-      await connection.commit();
-
-      res.json({ message: 'Primary image updated successfully' });
-
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
-
-  } catch (error) {
-    console.error('Set primary image error:', error);
-    res.status(500).json({ error: 'Failed to set primary image' });
-  }
-});
-
-// 10. REORDER IMAGES
-router.put('/:id/images/reorder', verifyToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { imageOrder } = req.body; // Array of image IDs in new order
-
-    if (!Array.isArray(imageOrder)) {
-      return res.status(400).json({ error: 'imageOrder must be an array of image IDs' });
-    }
-
-    // Check if property exists and user owns it
-    const [properties] = await pool.execute(
-      'SELECT homeowner_id FROM properties WHERE id = ?',
-      [id]
-    );
-
-    if (properties.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = properties[0];
-    
-    if (property.homeowner_id !== req.user.userId) {
-      return res.status(403).json({ error: 'You can only reorder images of your own properties' });
-    }
-
-    const connection = await pool.getConnection();
-    
-    try {
-      await connection.beginTransaction();
-
-      // Update display order for each image
-      for (let i = 0; i < imageOrder.length; i++) {
-        await connection.execute(
-          'UPDATE property_images SET display_order = ? WHERE id = ? AND property_id = ?',
-          [i, imageOrder[i], id]
-        );
-      }
-
-      await connection.commit();
-
-      res.json({ message: 'Images reordered successfully' });
-
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
-
-  } catch (error) {
-    console.error('Reorder images error:', error);
-    res.status(500).json({ error: 'Failed to reorder images' });
-  }
-});
-
-// 11. CHECK PROPERTY AVAILABILITY
-router.post('/:id/check-availability', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { start_date, end_date } = req.body;
-
-    if (!start_date || !end_date) {
-      return res.status(400).json({ error: 'start_date and end_date are required' });
-    }
-
-    // Check if property exists and is available
-    const [properties] = await pool.execute(
-      'SELECT min_stay_days, max_stay_days, status FROM properties WHERE id = ?',
-      [id]
-    );
-
-    if (properties.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = properties[0];
-    
-    if (property.status !== 'available') {
-      return res.json({
-        available: false,
-        message: 'Property is not available for new arrangements'
-      });
-    }
-
-    // Check stay duration
-    const start = new Date(start_date);
-    const end = new Date(end_date);
-    const stayDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-
-    if (stayDays < property.min_stay_days) {
-      return res.json({
-        available: false,
-        message: `Minimum stay is ${property.min_stay_days} days`
-      });
-    }
-
-    if (stayDays > property.max_stay_days) {
-      return res.json({
-        available: false,
-        message: `Maximum stay is ${property.max_stay_days} days`
-      });
-    }
-
-    // Check for date conflicts
-    const [conflicts] = await pool.execute(
-      `SELECT * FROM arrangements 
-       WHERE property_id = ? 
-       AND status IN ('pending', 'confirmed', 'active')
-       AND (
-         (start_date <= ? AND end_date >= ?) OR
-         (start_date <= ? AND end_date >= ?) OR
-         (start_date >= ? AND end_date <= ?)
-       )`,
-      [id, end_date, start_date, end_date, start_date, start_date, end_date]
-    );
-
-    if (conflicts.length > 0) {
-      return res.json({
-        available: false,
-        message: 'Property is not available for the selected dates'
-      });
-    }
-
-    res.json({
-      available: true,
-      message: 'Property is available for the selected dates',
-      stay_days: stayDays
-    });
-
-  } catch (error) {
-    console.error('Check availability error:', error);
-    res.status(500).json({ error: 'Failed to check availability' });
-  }
-});
-
-// 12. GET PROPERTY STATISTICS
-router.get('/:id/stats', verifyToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Check if property exists and user owns it
-    const [properties] = await pool.execute(
-      'SELECT homeowner_id FROM properties WHERE id = ?',
-      [id]
-    );
-
-    if (properties.length === 0) {
-      return res.status(404).json({ error: 'Property not found' });
-    }
-
-    const property = properties[0];
-    
-    if (property.homeowner_id !== req.user.userId && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'You can only view stats for your own properties' });
-    }
-
-    // Get arrangement statistics
-    const [arrangementStats] = await pool.execute(
-      `SELECT 
-        status,
-        COUNT(*) as count,
-        AVG(DATEDIFF(end_date, start_date)) as avg_duration
-      FROM arrangements 
-      WHERE property_id = ?
-      GROUP BY status`,
-      [id]
-    );
-
-    // Get total views (if you have a views tracking system)
-    const [viewsStats] = await pool.execute(
-      `SELECT 
-        COUNT(*) as total_views,
-        COUNT(DISTINCT user_id) as unique_viewers
-      FROM property_views 
-      WHERE property_id = ?`,
-      [id]
-    );
-
-    // Get inquiry statistics
-    const [inquiryStats] = await pool.execute(
-      `SELECT 
-        COUNT(*) as total_inquiries,
-        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_inquiries,
-        SUM(CASE WHEN status = 'responded' THEN 1 ELSE 0 END) as responded_inquiries
-      FROM inquiries 
-      WHERE property_id = ?`,
-      [id]
-    );
-
-    res.json({
-      arrangement_stats: arrangementStats,
-      view_stats: viewsStats[0] || { total_views: 0, unique_viewers: 0 },
-      inquiry_stats: inquiryStats[0] || { total_inquiries: 0, pending_inquiries: 0, responded_inquiries: 0 }
-    });
-
-  } catch (error) {
-    console.error('Get property stats error:', error);
-    res.status(500).json({ error: 'Failed to fetch property statistics' });
-  }
-});
-
-// 13. SEARCH PROPERTIES BY LOCATION (for maps)
-router.get('/search/location', async (req, res) => {
-  try {
-    const { lat, lng, radius = 10 } = req.query; // radius in kilometers
-
-    if (!lat || !lng) {
-      return res.status(400).json({ error: 'Latitude and longitude are required' });
-    }
-
-    // Haversine formula to calculate distance
-    const query = `
-      SELECT 
-        p.*,
-        u.name as homeowner_name,
-        (
-          6371 * acos(
-            cos(radians(?)) * cos(radians(p.latitude)) * 
-            cos(radians(p.longitude) - radians(?)) + 
-            sin(radians(?)) * sin(radians(p.latitude))
-          )
-        ) as distance,
-        (
-          SELECT pi.image_url 
-          FROM property_images pi 
-          WHERE pi.property_id = p.id AND pi.is_primary = 1 
-          LIMIT 1
-        ) as primary_image
-      FROM properties p
-      JOIN users u ON p.homeowner_id = u.id
-      WHERE p.status = 'available'
-        AND p.latitude IS NOT NULL 
-        AND p.longitude IS NOT NULL
-      HAVING distance <= ?
-      ORDER BY distance
-      LIMIT 50
-    `;
-
-    const [properties] = await pool.execute(query, [lat, lng, lat, parseFloat(radius)]);
-
-    res.json({
-      properties,
-      search_location: { lat: parseFloat(lat), lng: parseFloat(lng) },
-      radius_km: parseFloat(radius),
-      count: properties.length
-    });
-
-  } catch (error) {
-    console.error('Location search error:', error);
-    res.status(500).json({ error: 'Failed to search properties by location' });
   }
 });
 
