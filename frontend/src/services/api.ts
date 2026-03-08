@@ -1,6 +1,7 @@
 // src/services/api.ts - Updated with real Airbnb import
 const API_BASE_URL = 'http://localhost:5000/api';
 
+
 // Core Interfaces
 // src/services/api.ts
 
