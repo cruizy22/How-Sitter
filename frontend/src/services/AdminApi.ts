@@ -1,5 +1,6 @@
 // frontend/services/adminApi.ts
-import { api } from './api';
+
+/*import { api } from './api';
 
 // If you need types, you can import them from api.ts
 import type {
@@ -83,3 +84,5 @@ export type {
   SystemStats,
   PaginatedResponse
 };
+
+*/
