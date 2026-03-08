@@ -450,6 +450,7 @@ class ApiService {
     this.token = token;
     localStorage.setItem('token', token);
   }
+  
 
   getToken(): string | null {
     if (!this.token) {
@@ -1599,7 +1600,256 @@ class ApiService {
       throw error;
     }
   }
+// ========== MISSING ADMIN METHODS ==========
 
+/**
+ * Get audit logs
+ */
+async getAuditLogs(params?: { limit?: number; offset?: number; userId?: string }): Promise<AuditLog[]> {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/admin/audit-logs?${queryParams}`, {
+      headers: this.getHeaders(),
+    });
+    
+    if (!response.ok) {
+      console.warn('Audit logs endpoint not available, returning empty array');
+      return [];
+    }
+    
+    const data = await response.json();
+    return data.auditLogs || data.logs || data.data || data || [];
+  } catch (error) {
+    console.error('Error fetching audit logs:', error);
+    return [];
+  }
+}
+
+/**
+ * Get pending verifications
+ */
+async getPendingVerifications(): Promise<VerificationRequest[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/pending-verifications`, {
+      headers: this.getHeaders(),
+    });
+    
+    if (!response.ok) {
+      console.warn('Pending verifications endpoint not available, returning empty array');
+      return [];
+    }
+    
+    const data = await response.json();
+    return data.verifications || data.data || data.requests || data.pending || data || [];
+  } catch (error) {
+    console.error('Error fetching pending verifications:', error);
+    return [];
+  }
+}
+
+/**
+ * Get pending properties
+ */
+async getPendingProperties(): Promise<Property[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/pending/properties`, {
+      headers: this.getHeaders(),
+    });
+    
+    if (!response.ok) {
+      console.warn('Pending properties endpoint not available, returning empty array');
+      return [];
+    }
+    
+    const data = await response.json();
+    return data.properties || data.data || data || [];
+  } catch (error) {
+    console.error('Error fetching pending properties:', error);
+    return [];
+  }
+}
+
+/**
+ * Get pending sitters
+ */
+async getPendingSitters(): Promise<Sitter[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/pending/sitters`, {
+      headers: this.getHeaders(),
+    });
+    
+    if (!response.ok) {
+      console.warn('Pending sitters endpoint not available, returning empty array');
+      return [];
+    }
+    
+    const data = await response.json();
+    return data.sitters || data.data || data || [];
+  } catch (error) {
+    console.error('Error fetching pending sitters:', error);
+    return [];
+  }
+}
+
+/**
+ * Verify an entity (property, sitter, user)
+ */
+async verifyEntity(entityType: string, id: string, data: { approved: boolean; notes?: string }): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/verify/${entityType}/${id}`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return await this.handleResponse<{ success: boolean; message: string }>(response);
+  } catch (error) {
+    console.error(`Error verifying ${entityType}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Add verification notes
+ */
+async addVerificationNotes(entityType: string, id: string, notes: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/notes/${entityType}/${id}`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ notes })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return await this.handleResponse<{ success: boolean; message: string }>(response);
+  } catch (error) {
+    console.error(`Error adding notes to ${entityType}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Request more information
+ */
+async requestMoreInfo(entityType: string, id: string, message: string): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/request-info/${entityType}/${id}`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ message })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return await this.handleResponse<{ success: boolean; message: string }>(response);
+  } catch (error) {
+    console.error(`Error requesting info for ${entityType}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Get user details
+ */
+async getUserDetails(userId: string): Promise<User> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+      headers: this.getHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await this.handleResponse<any>(response);
+    return data.user || data.data || data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get property details (admin view)
+ */
+async getPropertyDetails(propertyId: string): Promise<PropertyDetail> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/properties/${propertyId}`, {
+      headers: this.getHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await this.handleResponse<any>(response);
+    return data.property || data.data || data;
+  } catch (error) {
+    console.error('Error fetching property details:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get system statistics
+ */
+async getSystemStats(): Promise<SystemStats> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/system-stats`, {
+      headers: this.getHeaders(),
+    });
+    
+    if (!response.ok) {
+      console.warn('System stats endpoint not available, returning default stats');
+      return {
+        dailyRegistrations: [],
+        roleDistribution: [],
+        propertyTypes: [],
+        monthlyRevenue: [],
+        verificationStats: {
+          pending_users: 0,
+          approved_users: 0,
+          pending_properties: 0,
+          approved_properties: 0
+        }
+      };
+    }
+    
+    const data = await this.handleResponse<any>(response);
+    return data.stats || data.data || data;
+  } catch (error) {
+    console.error('Error fetching system stats:', error);
+    return {
+      dailyRegistrations: [],
+      roleDistribution: [],
+      propertyTypes: [],
+      monthlyRevenue: [],
+      verificationStats: {
+        pending_users: 0,
+        approved_users: 0,
+        pending_properties: 0,
+        approved_properties: 0
+      }
+    };
+  }
+}
   async getAdminProperties(params?: { page?: number; limit?: number; status?: string }): Promise<PaginatedResponse<Property>> {
     const queryParams = new URLSearchParams();
     if (params) {

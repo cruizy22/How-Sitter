@@ -19,7 +19,7 @@ import { LegalDocs } from './components/LegalDocs';
 import { TravelTracker } from './components/TravelTracker';
 import { GlobalSitters } from './components/GlobalSitters';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { AdminDashboard } from './components/admin/AdminDashboard';
+//import { AdminDashboard } from './components/admin/AdminDashboard';
 import './styles/globals.css';
 // In your App.tsx or routing file, add:
 import { WorldMapPage } from './components/WorldMapPage';
@@ -37,7 +37,7 @@ const SimplePage = ({ title, children }: { title: string; children?: React.React
   </div>
 );
 
-// Admin Protected Route Component
+/*// Admin Protected Route Component
 const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -74,7 +74,7 @@ const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children
 
   return <>{children}</>;
 };
-
+*/
 const AppContent = () => {
   const location = useLocation();
   const { user, loading, logout } = useAuth();
@@ -97,11 +97,11 @@ const AppContent = () => {
       </div>
     );
   }
-
+ /*
   // Don't show Layout for admin dashboard
   const isAdminRoute = location.pathname.startsWith('/admin');
   
-  if (isAdminRoute) {
+ if (isAdminRoute) {
     return (
       <Routes>
         <Route path="/admin/dashboard" element={
@@ -113,7 +113,7 @@ const AppContent = () => {
       </Routes>
     );
   }
-
+*/
   return (
     <Layout 
       activeSection={activeSection} 
