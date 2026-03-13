@@ -338,3 +338,26 @@
       rounded-2xl;
   }
 }
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 0%, #e4e4e4 40%, #f0f0f0 80%);
+  background-size: 600px 100%;
+  animation: shimmer 1.6s infinite linear;
+}

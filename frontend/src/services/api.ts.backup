@@ -1,5 +1,5 @@
-﻿// src/services/api.ts - Updated with real Airbnb import
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+// src/services/api.ts - Updated with real Airbnb import
+const API_BASE_URL = 'http://localhost:5000/api';
 
 
 // Core Interfaces
@@ -1923,7 +1923,7 @@ async getSystemStats(): Promise<SystemStats> {
       
       return await this.handleResponse<{ success: boolean; message: string }>(response);
     } catch (error) {
-      console.error('âŒ approveProperty error:', error);
+      console.error('❌ approveProperty error:', error);
       throw error;
     }
   }
@@ -1942,7 +1942,7 @@ async getSystemStats(): Promise<SystemStats> {
       
       return await this.handleResponse<{ success: boolean; message: string }>(response);
     } catch (error) {
-      console.error('âŒ rejectProperty error:', error);
+      console.error('❌ rejectProperty error:', error);
       throw error;
     }
   }
@@ -1961,7 +1961,7 @@ async getSystemStats(): Promise<SystemStats> {
       
       return await this.handleResponse<{ success: boolean; message: string }>(response);
     } catch (error) {
-      console.error('âŒ updateUserRole error:', error);
+      console.error('❌ updateUserRole error:', error);
       throw error;
     }
   }
@@ -1980,7 +1980,7 @@ async getSystemStats(): Promise<SystemStats> {
       
       return await this.handleResponse<{ success: boolean; message: string }>(response);
     } catch (error) {
-      console.error('âŒ toggleUserSuspension error:', error);
+      console.error('❌ toggleUserSuspension error:', error);
       throw error;
     }
   }
