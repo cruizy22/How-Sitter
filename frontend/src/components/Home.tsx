@@ -942,7 +942,7 @@ export const Home: React.FC = () => {
                 color: 'rgba(255,255,255,.45)', 
                 fontSize: 13, 
                 fontWeight: 600, 
-                lineHeight: '70px',
+                lineHeight: '20px',
                 whiteSpace: 'nowrap'
               }}>Browse:</span>
               {[['🌟 Premium','premium'],['🐾 Pet friendly','pet-friendly'],['📅 Long term','long-term'],['✓ Verified','verified'],['🏙️ City centre','city']].map(([l,f]) => (
