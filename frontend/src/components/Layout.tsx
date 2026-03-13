@@ -147,7 +147,7 @@ export const Layout: React.FC<LayoutProps> = ({
             fontSize: isMobile ? 18 : 20, 
             letterSpacing: '-.3px' 
           }}>
-            {isMobile ? 'HS' : 'howsitter'}
+            {isMobile ? 'How Sitter' : 'HowSitter'}
           </span>
         </div>
 
