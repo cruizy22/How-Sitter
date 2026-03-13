@@ -931,12 +931,12 @@ export const Home: React.FC = () => {
             {/* quick filters - scrollable on mobile */}
             <div style={{ 
               display: 'flex', 
-              gap: 60, 
-              marginTop: 25, 
+              gap: 10, 
+              marginTop: 18, 
               flexWrap: isMobile ? 'nowrap' : 'wrap',
               overflowX: isMobile ? 'auto' : 'visible',
               WebkitOverflowScrolling: 'touch',
-              paddingBottom: isMobile ? '15px' : 0
+              paddingBottom: isMobile ? '8px' : 0
             }}>
               <span style={{ 
                 color: 'rgba(255,255,255,.45)', 
