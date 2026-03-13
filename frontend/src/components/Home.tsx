@@ -1140,7 +1140,10 @@ export const Home: React.FC = () => {
           </p>
 
           {/* ── search card ── */}
-          <div style={{ maxWidth: isMobile ? '100%' : 820 }}>
+          <div style={{ 
+            maxWidth: isMobile ? '100%' : 820,
+            marginBottom: isMobile ? '16px' : 0,
+          }}>
             {/* stay toggle - horizontal scroll on mobile */}
             <div style={{
               display: 'flex',
@@ -1178,7 +1181,8 @@ export const Home: React.FC = () => {
                 borderRadius: '16px',
                 overflow: 'hidden',
                 boxShadow: '0 16px 64px rgba(0,0,0,.35)',
-                padding: '16px'
+                padding: '16px',
+                marginBottom: '20px',
               }}>
                 <div style={{ marginBottom: '12px' }}>
                   <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>Location</div>
@@ -1253,6 +1257,7 @@ export const Home: React.FC = () => {
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr auto',
                 boxShadow: '0 16px 64px rgba(0,0,0,.35)',
+                marginBottom: '20px',
               }}>
                 {/* location */}
                 <div style={{ padding: '16px 24px', borderRight: `1px solid ${G.s200}` }}>
@@ -1298,43 +1303,104 @@ export const Home: React.FC = () => {
               </form>
             )}
 
-            {/* quick filters - scrollable on mobile */}
+            {/* quick filters - scrollable on mobile with better spacing */}
             <div style={{
               display: 'flex',
-              gap: 10,
-              marginTop: 18,
+              alignItems: 'center',
+              gap: 12,
+              marginTop: 20,
+              marginBottom: 10,
               flexWrap: isMobile ? 'nowrap' : 'wrap',
               overflowX: isMobile ? 'auto' : 'visible',
               WebkitOverflowScrolling: 'touch',
-              paddingBottom: isMobile ? '8px' : 0
+              paddingBottom: isMobile ? '16px' : 0,
+              paddingTop: isMobile ? '4px' : 0,
+              paddingLeft: isMobile ? '4px' : 0,
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              position: 'relative',
+              zIndex: 5,
+              minHeight: isMobile ? '56px' : 'auto',
             }}>
+              {/* Browse text with background for better visibility */}
               <span style={{
-                color: 'rgba(255,255,255,.45)',
-                fontSize: 13,
-                fontWeight: 600,
-                lineHeight: '32px',
-                whiteSpace: 'nowrap'
-              }}>Browse:</span>
+                color: '#fff',
+                fontSize: isMobile ? 15 : 14,
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+                background: 'rgba(13,61,36,.5)',
+                padding: isMobile ? '8px 16px' : '4px 12px',
+                borderRadius: '30px',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,.2)',
+                marginRight: '4px',
+                flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(0,0,0,.15)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}>
+                <span style={{ fontSize: '16px' }}>🔍</span> Browse:
+              </span>
+              
+              {/* Filter buttons */}
               {[['🌟 Premium', 'premium'], ['🐾 Pet friendly', 'pet-friendly'], ['📅 Long term', 'long-term'], ['✓ Verified', 'verified'], ['🏙️ City centre', 'city']].map(([l, f]) => (
                 <button
                   key={f}
                   onClick={() => nav(`/properties?filter=${f}`)}
                   style={{
-                    background: 'rgba(255,255,255,.1)',
-                    border: '1.5px solid rgba(255,255,255,.22)',
-                    color: 'rgba(255,255,255,.85)',
-                    borderRadius: 999,
-                    padding: isMobile ? '6px 12px' : '6px 16px',
-                    fontSize: isMobile ? 12 : 13,
+                    background: 'rgba(255,255,255,.15)',
+                    border: '1.5px solid rgba(255,255,255,.25)',
+                    color: '#fff',
+                    borderRadius: 40,
+                    padding: isMobile ? '10px 20px' : '6px 16px',
+                    fontSize: isMobile ? 15 : 13,
                     fontWeight: 600,
                     whiteSpace: 'nowrap',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(8px)',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(0,0,0,.2)',
+                    minHeight: isMobile ? '48px' : '36px',
+                    minWidth: isMobile ? 'auto' : 'auto',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,.3)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,.15)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,.25)';
                   }}
                 >
                   {l}
                 </button>
               ))}
             </div>
+
+            {/* Hint for scrolling on mobile */}
+            {isMobile && (
+              <div style={{
+                textAlign: 'center',
+                marginTop: '4px',
+                marginBottom: '8px',
+                color: 'rgba(255,255,255,.6)',
+                fontSize: '12px',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+              }}>
+                <span>←</span>
+                <span>Swipe to see more filters</span>
+                <span>→</span>
+              </div>
+            )}
           </div>
 
           {/* hero dots */}
@@ -2306,6 +2372,59 @@ export const Home: React.FC = () => {
           +
         </button>
       )}
+      
+      {/* Add global styles for animations and scroll hints */}
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: -600px 0; }
+          100% { background-position: 600px 0; }
+        }
+        
+        @keyframes ticker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        
+        .hs-card {
+          transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+        
+        .hs-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 48px rgba(0,0,0,.13) !important;
+        }
+        
+        /* Hide scrollbar but keep functionality */
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        
+        /* Ensure proper spacing on mobile */
+        @media (max-width: 768px) {
+          .hero-search-container {
+            padding-bottom: 16px !important;
+            margin-bottom: 8px !important;
+          }
+          
+          /* Add gradient fade to indicate scrolling */
+          .filters-scroll-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 40px;
+            background: linear-gradient(to right, transparent, rgba(13,61,36,.8));
+            pointer-events: none;
+            border-radius: 0 16px 16px 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };
