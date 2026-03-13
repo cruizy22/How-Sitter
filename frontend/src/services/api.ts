@@ -1,9 +1,29 @@
-﻿// src/services/api.ts - Updated with real Airbnb import
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+﻿// src/services/api.ts
 
+// Add this at the very top to handle Vite environment variables
+/// <reference types="vite/client" />
 
-// Core Interfaces
-// src/services/api.ts
+// Safe environment variable access
+const getApiUrl = (): string => {
+  try {
+    // For Vite environment (development)
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      return (import.meta.env as any).VITE_API_URL || '/api';
+    }
+    
+    // For Node.js environment (fallback)
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.VITE_API_URL || '/api';
+    }
+  } catch (error) {
+    console.warn('Error accessing environment variables:', error);
+  }
+  
+  // Default fallback
+  return '/api';
+};
+
+export const API_BASE_URL = getApiUrl();
 
 export interface PropertyImage {
   id: string;
