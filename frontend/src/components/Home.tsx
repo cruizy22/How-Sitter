@@ -168,7 +168,7 @@ const PropertyThumb: React.FC<{ p: Property|undefined; idx: number; nav: any; st
 /* ══ Mobile PropertyCard ══ */
 const PropertyCardMobile: React.FC<{ p: Property; i: number; nav: any; stayMode: string; isMobile: boolean }> = ({ p, i, nav, stayMode, isMobile }) => {
   const [saved, setSaved] = useState(false);
-  const price = stayMode === 'nightly' ? Math.round(p.price_per_month / 30) : p.price_per_month;
+  const price = stayMode === 'Nightly' ? Math.round(p.price_per_month / 30) : p.price_per_month;
   const src = p.primary_image || IMGS.properties[i % IMGS.properties.length];
 
   return (
@@ -260,7 +260,7 @@ const PropertyCard: React.FC<{ p: Property; i: number; nav: any; stayMode: strin
   const [saved, setSaved] = useState(false);
   const [imgI,  setImgI]  = useState(0);
   const allImgs = p.primary_image ? [p.primary_image, ...IMGS.properties.slice(0,3)] : IMGS.properties.slice(i%8, i%8+4);
-  const price = stayMode==='nightly' ? Math.round(p.price_per_month/30) : p.price_per_month;
+  const price = stayMode==='Nightly' ? Math.round(p.price_per_month/30) : p.price_per_month;
   const orig  = Math.round(price*1.08);
 
   return (
@@ -553,7 +553,7 @@ export const Home: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'properties'|'sitters'>('properties');
-  const [stayMode, setStayMode] = useState<'monthly'|'nightly'>('monthly');
+  const [stayMode, setStayMode] = useState<'Monthly'|'Nightly'>('Monthly');
   const [location, setLocation] = useState('');
   const [budget, setBudget] = useState('');
   const [heroIdx, setHeroIdx] = useState(0);
@@ -771,7 +771,7 @@ export const Home: React.FC = () => {
             marginBottom: isMobile ? 24 : 36, 
             fontWeight: 500 
           }}>
-            Connect with verified house sitters worldwide. Secure, flexible arrangements — monthly or nightly.
+            Connect with verified house Sitters and Listers worldwide. Secure, flexible arrangements — monthly or nightly.
           </p>
 
           {/* ── search card ── */}
@@ -784,7 +784,7 @@ export const Home: React.FC = () => {
               WebkitOverflowScrolling: 'touch',
               paddingBottom: isMobile ? '4px' : 0
             }}>
-              {(['monthly','nightly'] as const).map(m => (
+              {(['Monthly','Nightly'] as const).map(m => (
                 <button 
                   key={m} 
                   onClick={() => setStayMode(m)} 
@@ -838,7 +838,7 @@ export const Home: React.FC = () => {
                 
                 <div style={{ marginBottom: '16px' }}>
                   <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>
-                    {stayMode === 'monthly' ? 'Monthly budget' : 'Nightly rate'}
+                    {stayMode === 'Monthly' ? 'Monthly budget' : 'Nightly rate'}
                   </div>
                   <select 
                     value={budget} 
@@ -855,7 +855,7 @@ export const Home: React.FC = () => {
                     }}
                   >
                     <option value="">Set budget</option>
-                    {(stayMode === 'monthly'
+                    {(stayMode === 'Monthly'
                       ? ['Under $1,000', '$1,000–$1,500', '$1,500–$2,000', '$2,000–$3,000', '$3,000+']
                       : ['Under $80', '$80–$120', '$120–$180', '$180–$250', '$250+']
                     ).map(b => <option key={b}>{b}</option>)}
@@ -904,7 +904,7 @@ export const Home: React.FC = () => {
                 {/* budget */}
                 <div style={{ padding: '16px 24px', borderRight: `1px solid ${G.s200}` }}>
                   <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>
-                    {stayMode === 'monthly' ? 'Monthly budget' : 'Nightly rate'}
+                    {stayMode === 'Monthly' ? 'Monthly budget' : 'Nightly rate'}
                   </div>
                   <select 
                     value={budget} 
@@ -912,7 +912,7 @@ export const Home: React.FC = () => {
                     style={{ width: '100%', border: 'none', fontSize: 15, color: G.s900, fontWeight: 700, background: 'transparent' }}
                   >
                     <option value="">Set budget</option>
-                    {(stayMode === 'monthly'
+                    {(stayMode === 'Monthly'
                       ? ['Under $1,000', '$1,000–$1,500', '$1,500–$2,000', '$2,000–$3,000', '$3,000+']
                       : ['Under $80', '$80–$120', '$120–$180', '$180–$250', '$250+']
                     ).map(b => <option key={b}>{b}</option>)}
@@ -1009,7 +1009,7 @@ export const Home: React.FC = () => {
       </section>
 
       {/* ══ TICKER STRIP ══ */}
-      <div style={{ background: G.y500, padding: '11px 0', overflow: 'hidden' }}>
+      <div style={{ background: G.y500, padding: '20px ', overflow: 'hidden' }}>
         <div style={{ 
           display: 'inline-block', 
           animation: 'ticker 32s linear infinite', 
