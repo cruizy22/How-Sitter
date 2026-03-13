@@ -553,11 +553,7 @@ export const Home: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'properties'|'sitters'>('properties');
-<<<<<<< HEAD
   const [stayMode, setStayMode] = useState<'Monthly'|'Nightly'>('Monthly');
-=======
-  const [stayMode, setStayMode] = useState<'monthly'|'Nightly'>('Monthly');
->>>>>>> 0b8cd69f70cf24610396d6ff2c17b0c564ac931c
   const [location, setLocation] = useState('');
   const [budget, setBudget] = useState('');
   const [heroIdx, setHeroIdx] = useState(0);
