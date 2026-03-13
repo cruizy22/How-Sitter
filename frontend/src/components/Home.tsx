@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { api, Property, Sitter } from '../services/api';
+import { api, Property, Sitter } from '../services/api'; 
 import { WorldMap } from './WorldMap';
 import { useMobile } from '../hooks/useMobile';
 
@@ -553,7 +553,11 @@ export const Home: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'properties'|'sitters'>('properties');
+<<<<<<< HEAD
   const [stayMode, setStayMode] = useState<'Monthly'|'Nightly'>('Monthly');
+=======
+  const [stayMode, setStayMode] = useState<'monthly'|'Nightly'>('Monthly');
+>>>>>>> 0b8cd69f70cf24610396d6ff2c17b0c564ac931c
   const [location, setLocation] = useState('');
   const [budget, setBudget] = useState('');
   const [heroIdx, setHeroIdx] = useState(0);
@@ -942,7 +946,7 @@ export const Home: React.FC = () => {
                 color: 'rgba(255,255,255,.45)', 
                 fontSize: 13, 
                 fontWeight: 600, 
-                lineHeight: '32px',
+                lineHeight: '70px',
                 whiteSpace: 'nowrap'
               }}>Browse:</span>
               {[['🌟 Premium','premium'],['🐾 Pet friendly','pet-friendly'],['📅 Long term','long-term'],['✓ Verified','verified'],['🏙️ City centre','city']].map(([l,f]) => (
