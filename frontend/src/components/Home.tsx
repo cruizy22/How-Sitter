@@ -261,7 +261,7 @@ const PropertyCardMobile: React.FC<{ p: Property; i: number; nav: any; stayMode:
         marginBottom: 16
       }}
     >
-      <div style={{ position: 'relative', height: isMobile ? 180 : 210, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', height: isMobile ? 160 : 210, overflow: 'hidden' }}>
         <img
           src={src}
           alt={p.title}
@@ -274,7 +274,8 @@ const PropertyCardMobile: React.FC<{ p: Property; i: number; nav: any; stayMode:
           ...pill(p.price_per_month > 2000 ? '#7C3AED' : p.price_per_month > 1400 ? G.g700 : G.s500, '#fff'),
           position: 'absolute',
           top: 12,
-          left: 12
+          left: 12,
+          fontSize: 10
         }}>
           {p.price_per_month > 2000 ? 'premium' : p.price_per_month > 1400 ? 'standard' : 'basic'}
         </div>
@@ -303,10 +304,10 @@ const PropertyCardMobile: React.FC<{ p: Property; i: number; nav: any; stayMode:
         </button>
       </div>
 
-      <div style={{ padding: isMobile ? '14px 16px' : '18px 20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+      <div style={{ padding: isMobile ? '12px' : '18px 20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
           <h3 style={{
-            fontSize: isMobile ? 15 : 16,
+            fontSize: isMobile ? 14 : 16,
             fontWeight: 800,
             color: G.g900,
             flex: 1,
@@ -316,24 +317,24 @@ const PropertyCardMobile: React.FC<{ p: Property; i: number; nav: any; stayMode:
           }}>
             {p.title}
           </h3>
-          <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 12 }}>
-            <div style={{ fontSize: isMobile ? 17 : 19, fontWeight: 900, color: G.g900 }}>
+          <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 8 }}>
+            <div style={{ fontSize: isMobile ? 16 : 19, fontWeight: 900, color: G.g900 }}>
               ${price.toLocaleString()}
             </div>
           </div>
         </div>
-        <div style={{ fontSize: isMobile ? 12 : 13, color: G.s400, marginBottom: 10, fontWeight: 500 }}>
+        <div style={{ fontSize: isMobile ? 11 : 13, color: G.s400, marginBottom: 8, fontWeight: 500 }}>
           {p.bedrooms}bd · {p.bathrooms}ba · {p.city}
         </div>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
-          {(p.amenities || ['WiFi', 'Furnished', 'Pets OK']).slice(0, isMobile ? 2 : 3).map(a => (
+        <div style={{ display: 'flex', gap: 4, marginBottom: 12, flexWrap: 'wrap' }}>
+          {(p.amenities || ['WiFi', 'Furnished', 'Pets OK']).slice(0, 2).map(a => (
             <span key={a} style={{
-              fontSize: isMobile ? 10 : 11,
+              fontSize: 10,
               color: G.s500,
               background: G.s100,
               border: `1px solid ${G.s200}`,
               borderRadius: 6,
-              padding: '3px 9px',
+              padding: '2px 8px',
               fontWeight: 600
             }}>
               {a}
@@ -350,9 +351,9 @@ const PropertyCardMobile: React.FC<{ p: Property; i: number; nav: any; stayMode:
             background: G.g900,
             color: '#fff',
             border: 'none',
-            borderRadius: 9,
-            padding: isMobile ? '10px' : '8px 18px',
-            fontSize: isMobile ? 13 : 12,
+            borderRadius: 8,
+            padding: '10px',
+            fontSize: 12,
             fontWeight: 800,
             cursor: 'pointer'
           }}
@@ -566,7 +567,7 @@ const SitterCardMobile: React.FC<{ s: Sitter; nav: any; safeRating: (r: any) => 
         background: G.wh,
         borderRadius: 18,
         border: `1.5px solid ${G.s200}`,
-        padding: isMobile ? 16 : 24,
+        padding: isMobile ? 14 : 24,
         position: 'relative',
         boxShadow: '0 2px 10px rgba(0,0,0,.05)',
         cursor: 'pointer',
@@ -583,11 +584,11 @@ const SitterCardMobile: React.FC<{ s: Sitter; nav: any; safeRating: (r: any) => 
         {saved ? '❤️' : '🤍'}
       </button>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div style={{
-            width: isMobile ? 48 : 56,
-            height: isMobile ? 48 : 56,
+            width: isMobile ? 44 : 56,
+            height: isMobile ? 44 : 56,
             borderRadius: '50%',
             overflow: 'hidden',
             border: `2.5px solid ${G.s200}`
@@ -622,8 +623,8 @@ const SitterCardMobile: React.FC<{ s: Sitter; nav: any; safeRating: (r: any) => 
               position: 'absolute',
               bottom: 1,
               right: 1,
-              width: 12,
-              height: 12,
+              width: 10,
+              height: 10,
               borderRadius: '50%',
               background: '#10B981',
               border: '2px solid #fff'
@@ -634,23 +635,23 @@ const SitterCardMobile: React.FC<{ s: Sitter; nav: any; safeRating: (r: any) => 
         <div style={{ paddingTop: 2 }}>
           <div style={{ fontWeight: 800, color: G.g900, fontSize: isMobile ? 14 : 15 }}>{s.name}</div>
           {s.is_verified && (
-            <span style={{ ...pill(G.g100, G.g700, { fontSize: isMobile ? 10 : 11, padding: '2px 9px', marginTop: 4, display: 'inline-flex' }) }}>
+            <span style={{ ...pill(G.g100, G.g700, { fontSize: 10, padding: '2px 8px', marginTop: 4, display: 'inline-flex' }) }}>
               ✓ Verified
             </span>
           )}
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
         {[1, 2, 3, 4, 5].map(j => (
-          <span key={j} style={{ color: j <= Math.floor(rating) ? G.y500 : G.s200, fontSize: isMobile ? 12 : 13 }}>★</span>
+          <span key={j} style={{ color: j <= Math.floor(rating) ? G.y500 : G.s200, fontSize: 11 }}>★</span>
         ))}
-        <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 800, color: G.g900 }}>{rating.toFixed(1)}</span>
-        <span style={{ fontSize: isMobile ? 10 : 12, color: G.s400, fontWeight: 500 }}>({s.total_reviews || 0})</span>
+        <span style={{ fontSize: 11, fontWeight: 800, color: G.g900, marginLeft: 2 }}>{rating.toFixed(1)}</span>
+        <span style={{ fontSize: 10, color: G.s400, fontWeight: 500 }}>({s.total_reviews || 0})</span>
       </div>
 
       {s.location && (
-        <div style={{ fontSize: isMobile ? 11 : 12, color: G.s500, marginBottom: 12, fontWeight: 500 }}>
+        <div style={{ fontSize: 11, color: G.s500, marginBottom: 10, fontWeight: 500 }}>
           📍 {s.location}
         </div>
       )}
@@ -658,12 +659,12 @@ const SitterCardMobile: React.FC<{ s: Sitter; nav: any; safeRating: (r: any) => 
       <button
         style={{
           width: '100%',
-          padding: isMobile ? 12 : 10,
+          padding: 10,
           background: G.g900,
           color: '#fff',
           border: 'none',
-          borderRadius: 9,
-          fontSize: isMobile ? 13 : 13,
+          borderRadius: 8,
+          fontSize: 12,
           fontWeight: 800,
           cursor: 'pointer'
         }}
@@ -807,13 +808,13 @@ const StatsBar: React.FC<{ stats: Stats | null; isMobile: boolean }> = ({ stats,
   const { ref, vis } = useInView();
 
   return (
-    <section ref={ref} style={{ background: G.g900, padding: isMobile ? '32px 16px' : '44px 40px' }}>
+    <section ref={ref} style={{ background: G.g900, padding: isMobile ? '24px 16px' : '44px 40px' }}>
       <div style={{
         maxWidth: 1180,
         margin: '0 auto',
         display: 'grid',
         gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-        gap: isMobile ? 20 : 0,
+        gap: isMobile ? 16 : 0,
         textAlign: 'center'
       }}>
         {(stats ? [
@@ -834,16 +835,16 @@ const StatsBar: React.FC<{ stats: Stats | null; isMobile: boolean }> = ({ stats,
           >
             {s.v ? (
               <>
-                <div style={{ fontSize: isMobile ? 28 : 42, fontWeight: 900, color: G.y500, lineHeight: 1, marginBottom: 6 }}>
+                <div style={{ fontSize: isMobile ? 24 : 42, fontWeight: 900, color: G.y500, lineHeight: 1, marginBottom: 4 }}>
                   {s.v}
                 </div>
-                <div style={{ fontSize: isMobile ? 10 : 12, color: 'rgba(255,255,255,.45)', textTransform: 'uppercase', letterSpacing: '.1em', fontWeight: 700 }}>
+                <div style={{ fontSize: isMobile ? 9 : 12, color: 'rgba(255,255,255,.45)', textTransform: 'uppercase', letterSpacing: '.1em', fontWeight: 700 }}>
                   {s.l}
                 </div>
               </>
             ) : (
               <div style={{
-                height: isMobile ? 40 : 60,
+                height: isMobile ? 36 : 60,
                 borderRadius: 8,
                 background: 'linear-gradient(90deg, #f0f0f0 0%, #e4e4e4 40%, #f0f0f0 80%)',
                 backgroundSize: '600px 100%',
@@ -875,17 +876,18 @@ const EmptyState: React.FC<{ icon: string; msg: string; onRetry: () => void; isM
   onRetry,
   isMobile
 }) => (
-  <div style={{ textAlign: 'center', padding: isMobile ? 40 : 60, color: G.s500, gridColumn: '1/-1' }}>
-    <div style={{ fontSize: isMobile ? 36 : 44, marginBottom: 14 }}>{icon}</div>
-    <p style={{ marginBottom: 18, fontWeight: 600 }}>{msg}</p>
+  <div style={{ textAlign: 'center', padding: isMobile ? 32 : 60, color: G.s500, gridColumn: '1/-1' }}>
+    <div style={{ fontSize: isMobile ? 32 : 44, marginBottom: 12 }}>{icon}</div>
+    <p style={{ marginBottom: 16, fontWeight: 600, fontSize: isMobile ? 14 : 16 }}>{msg}</p>
     <button
       onClick={onRetry}
       style={{
         background: G.g700,
         color: '#fff',
         border: 'none',
-        borderRadius: 10,
-        padding: isMobile ? '8px 24px' : '10px 28px',
+        borderRadius: 8,
+        padding: isMobile ? '8px 20px' : '10px 28px',
+        fontSize: isMobile ? 13 : 14,
         fontWeight: 800,
         cursor: 'pointer'
       }}
@@ -896,7 +898,7 @@ const EmptyState: React.FC<{ icon: string; msg: string; onRetry: () => void; isM
 );
 
 /* ══════════════════════════════════════════
-   HOME Main Component
+   HOME Main Component - OPTIMIZED FOR MOBILE
 ══════════════════════════════════════════ */
 export const Home: React.FC = () => {
   const nav = useNavigate();
@@ -913,12 +915,13 @@ export const Home: React.FC = () => {
   const [heroIdx, setHeroIdx] = useState(0);
   const [heroAnim, setHeroAnim] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showAllFilters, setShowAllFilters] = useState(false);
 
-  // Responsive values
-  const heroHeight = isMobile ? 500 : isTablet ? 580 : 640;
-  const sectionPadding = isMobile ? '60px 20px' : isTablet ? '80px 32px' : '100px 40px';
+  // Responsive values - OPTIMIZED FOR MOBILE
+  const heroHeight = isMobile ? 420 : isTablet ? 580 : 640;
+  const sectionPadding = isMobile ? '40px 16px' : isTablet ? '80px 32px' : '100px 40px';
   const containerMaxWidth = isMobile ? '100%' : isTablet ? '768px' : '1180px';
-  const gridGap = isMobile ? '20px' : isTablet ? '24px' : '30px';
+  const gridGap = isMobile ? '16px' : isTablet ? '24px' : '30px';
 
   /* auto-advance hero */
   useEffect(() => {
@@ -1007,6 +1010,18 @@ export const Home: React.FC = () => {
   const s7 = useInView();
   const s8 = useInView();
 
+  // Filter chips data
+  const filterChips = [
+    { label: '🌟 Premium', filter: 'premium' },
+    { label: '🐾 Pets', filter: 'pet-friendly' },
+    { label: '📅 Long term', filter: 'long-term' },
+    { label: '✓ Verified', filter: 'verified' },
+    { label: '🏙️ City', filter: 'city' },
+    { label: '🛋️ Furnished', filter: 'furnished' },
+    { label: '🌿 Garden', filter: 'garden' },
+    { label: '🏊 Pool', filter: 'pool' }
+  ];
+
   return (
     <div style={{
       fontFamily: G.f,
@@ -1062,7 +1077,7 @@ export const Home: React.FC = () => {
         </div>
       )}
 
-      {/* ══ HERO — Responsive full-bleed ══ */}
+      {/* ══ HERO — OPTIMIZED FOR MOBILE ══ */}
       <section style={{
         position: 'relative',
         height: heroHeight,
@@ -1095,83 +1110,74 @@ export const Home: React.FC = () => {
           background: 'linear-gradient(to bottom, rgba(13,61,36,.55) 0%, rgba(13,61,36,.72) 55%, rgba(13,61,36,.92) 100%)'
         }} />
 
-        {/* content */}
+        {/* content - MOBILE OPTIMIZED */}
         <div style={{
           position: 'relative',
           zIndex: 2,
           maxWidth: containerMaxWidth,
           margin: '0 auto',
-          padding: isMobile ? '0 16px' : '0 40px',
+          padding: isMobile ? '0 12px' : '0 40px',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center'
         }}>
-          {/* sub-label */}
-          <div style={{ marginBottom: isMobile ? 12 : 16 }}>
+          {/* sub-label - smaller on mobile */}
+          <div style={{ marginBottom: isMobile ? 8 : 16 }}>
             <span style={{
               ...pill('rgba(245,166,35,.2)', G.y500),
               border: '1.5px solid rgba(245,166,35,.45)',
-              fontSize: isMobile ? 10 : 12
+              fontSize: isMobile ? 9 : 12,
+              padding: isMobile ? '4px 8px' : '4px 12px'
             }}>
-              ✦ TRUSTED HOUSE SITTING · 65+ COUNTRIES
+              ✦ 65+ COUNTRIES
             </span>
           </div>
 
-          {/* headline */}
+          {/* headline - COMPACT on mobile */}
           <h1 style={{
-            fontSize: isMobile ? 'clamp(28px, 8vw, 38px)' : 'clamp(38px, 5.5vw, 68px)',
+            fontSize: isMobile ? 'clamp(22px, 6vw, 28px)' : 'clamp(38px, 5.5vw, 68px)',
             fontWeight: 900,
             color: '#fff',
-            lineHeight: 1.06,
+            lineHeight: 1.1,
             letterSpacing: '-.04em',
             maxWidth: isMobile ? '100%' : 720,
-            marginBottom: isMobile ? 12 : 20
+            marginBottom: isMobile ? 8 : 20
           }}>
             Your home,<br />
-            <span style={{ color: G.y500 }}>Beautifully</span> Cared for.
+            <span style={{ color: G.y500 }}>Beautifully Cared for</span>
           </h1>
 
-          <p style={{
-            fontSize: isMobile ? 15 : 17,
-            color: 'rgba(255,255,255,.72)',
-            maxWidth: isMobile ? '100%' : 500,
-            lineHeight: 1.65,
-            marginBottom: isMobile ? 24 : 36,
-            fontWeight: 500
-          }}>
-            Connect with verified house Sitters and Listers worldwide. Secure, flexible arrangements — monthly or nightly.
-          </p>
-
-          {/* ── search card ── */}
+          {/* ── search card - COMPACT for mobile ── */}
           <div style={{ 
             maxWidth: isMobile ? '100%' : 820,
-            marginBottom: isMobile ? '20px' : 0,
+            marginBottom: isMobile ? '12px' : 0,
           }}>
-            {/* stay toggle - horizontal scroll on mobile */}
+            {/* stay toggle - smaller on mobile */}
             <div style={{
               display: 'flex',
               marginBottom: 0,
-              overflowX: isMobile ? 'auto' : 'visible',
+              overflowX: 'auto',
               WebkitOverflowScrolling: 'touch',
-              paddingBottom: isMobile ? '4px' : 0,
-              gap: '4px'
+              paddingBottom: '4px',
+              gap: '2px'
             }}>
               {(['Monthly', 'Nightly'] as const).map(m => (
                 <button
                   key={m}
                   onClick={() => setStayMode(m)}
                   style={{
-                    padding: isMobile ? '8px 16px' : '10px 24px',
+                    padding: isMobile ? '6px 12px' : '10px 24px',
                     borderRadius: '12px 12px 0 0',
-                    fontSize: isMobile ? 12 : 13,
+                    fontSize: isMobile ? 11 : 13,
                     fontWeight: 700,
                     background: stayMode === m ? '#fff' : 'rgba(255,255,255,.15)',
                     color: stayMode === m ? G.g800 : 'rgba(255,255,255,.75)',
                     border: 'none',
                     marginRight: 0,
                     whiteSpace: 'nowrap',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    minHeight: 'auto'
                   }}
                 >
                   {m}
@@ -1179,29 +1185,29 @@ export const Home: React.FC = () => {
               ))}
             </div>
 
-            {/* Mobile search form - stacked with better margins */}
+            {/* Mobile search form - ULTRA COMPACT */}
             {isMobile ? (
               <form onSubmit={handleSearch} style={{
                 background: '#fff',
-                borderRadius: '16px',
+                borderRadius: '12px',
                 overflow: 'hidden',
-                boxShadow: '0 16px 64px rgba(0,0,0,.35)',
-                padding: '20px',
-                margin: '20px 0 24px 0',
+                boxShadow: '0 8px 24px rgba(0,0,0,.25)',
+                padding: '12px',
+                margin: '12px 0 16px 0',
               }}>
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Location</div>
+                <div style={{ marginBottom: '10px' }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>📍 Location</div>
                   <select
                     value={location}
                     onChange={e => setLocation(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '14px',
+                      padding: '10px',
                       border: `1px solid ${G.s200}`,
-                      borderRadius: '8px',
-                      fontSize: 15,
+                      borderRadius: '6px',
+                      fontSize: 13,
                       color: G.s900,
-                      fontWeight: 700,
+                      fontWeight: 600,
                       background: G.wh
                     }}
                   >
@@ -1210,21 +1216,21 @@ export const Home: React.FC = () => {
                   </select>
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>
-                    {stayMode === 'Monthly' ? 'Monthly budget' : 'Nightly rate'}
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>
+                    {stayMode === 'Monthly' ? '💰 Monthly budget' : '💰 Nightly rate'}
                   </div>
                   <select
                     value={budget}
                     onChange={e => setBudget(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '14px',
+                      padding: '10px',
                       border: `1px solid ${G.s200}`,
-                      borderRadius: '8px',
-                      fontSize: 15,
+                      borderRadius: '6px',
+                      fontSize: 13,
                       color: G.s900,
-                      fontWeight: 700,
+                      fontWeight: 600,
                       background: G.wh
                     }}
                   >
@@ -1243,11 +1249,12 @@ export const Home: React.FC = () => {
                     background: G.g700,
                     color: '#fff',
                     border: 'none',
-                    padding: '16px',
-                    fontSize: 16,
+                    padding: '12px',
+                    fontSize: 14,
                     fontWeight: 900,
-                    borderRadius: '8px',
-                    cursor: 'pointer'
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    minHeight: '44px'
                   }}
                 >
                   Check availability
@@ -1308,171 +1315,109 @@ export const Home: React.FC = () => {
               </form>
             )}
 
-            {/* quick filters - scrollable on mobile with better spacing */}
+            {/* quick filters - MOBILE OPTIMIZED with toggle */}
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              marginTop: 24,
-              marginBottom: 20,
-              flexWrap: isMobile ? 'nowrap' : 'wrap',
-              overflowX: isMobile ? 'auto' : 'visible',
-              WebkitOverflowScrolling: 'touch',
-              paddingBottom: isMobile ? '20px' : 0,
-              paddingTop: isMobile ? '4px' : 0,
-              paddingLeft: isMobile ? '16px' : 0,
-              paddingRight: isMobile ? '16px' : 0,
-              marginLeft: isMobile ? '-16px' : 0,
-              marginRight: isMobile ? '-16px' : 0,
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              position: 'relative',
-              zIndex: 5,
-              minHeight: isMobile ? '60px' : 'auto',
+              marginTop: 12,
+              marginBottom: 8
             }}>
-              {/* Browse text with background for better visibility */}
-              <span style={{
-                color: '#fff',
-                fontSize: isMobile ? 15 : 14,
-                fontWeight: 700,
-                whiteSpace: 'nowrap',
-                background: 'rgba(13,61,36,.5)',
-                padding: isMobile ? '8px 16px' : '4px 12px',
-                borderRadius: '30px',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,.2)',
-                marginRight: '4px',
-                marginLeft: isMobile ? '0' : 0,
-                flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(0,0,0,.15)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}>
-                <span style={{ fontSize: '16px' }}>🔍</span> Browse:
-              </span>
-              
-              {/* Filter buttons */}
-              {[['🌟 Premium', 'premium'], ['🐾 Pet friendly', 'pet-friendly'], ['📅 Long term', 'long-term'], ['✓ Verified', 'verified'], ['🏙️ City centre', 'city']].map(([l, f]) => (
-                <button
-                  key={f}
-                  onClick={() => nav(`/properties?filter=${f}`)}
-                  style={{
-                    background: 'rgba(255,255,255,.15)',
-                    border: '1.5px solid rgba(255,255,255,.25)',
-                    color: '#fff',
-                    borderRadius: 40,
-                    padding: isMobile ? '10px 20px' : '6px 16px',
-                    fontSize: isMobile ? 15 : 13,
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    backdropFilter: 'blur(8px)',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 2px 8px rgba(0,0,0,.2)',
-                    minHeight: isMobile ? '48px' : '36px',
-                    minWidth: isMobile ? 'auto' : 'auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,.3)';
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,.5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,.15)';
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,.25)';
-                  }}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-
-            {/* Hint for scrolling on mobile */}
-            {isMobile && (
+              {/* Browse text with toggle button */}
               <div style={{
-                textAlign: 'center',
-                marginTop: '0',
-                marginBottom: '16px',
-                color: 'rgba(255,255,255,.6)',
-                fontSize: '12px',
-                fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                padding: '0 16px'
+                justifyContent: 'space-between',
+                marginBottom: 8,
+                padding: '0 4px'
               }}>
-                <span>←</span>
-                <span>Swipe to see more filters</span>
-                <span>→</span>
-              </div>
-            )}
-          </div>
-
-          {/* hero dots */}
-          {!isMobile && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 32 }}>
-              {IMGS.hero.map((_, i) => (
+                <span style={{
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  background: 'rgba(13,61,36,.5)',
+                  padding: '4px 10px',
+                  borderRadius: '30px',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255,255,255,.2)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}>
+                  <span>🔍</span> Filters:
+                </span>
+                
                 <button
-                  key={i}
-                  onClick={() => {
-                    setHeroIdx(i);
-                    setHeroAnim(true);
-                  }}
+                  onClick={() => setShowAllFilters(!showAllFilters)}
                   style={{
-                    width: heroIdx === i ? 28 : 8,
-                    height: 8,
-                    borderRadius: 999,
-                    border: 'none',
+                    background: 'rgba(255,255,255,.2)',
+                    border: '1px solid rgba(255,255,255,.3)',
+                    color: '#fff',
+                    borderRadius: 20,
+                    padding: '4px 10px',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    backdropFilter: 'blur(8px)',
                     cursor: 'pointer',
-                    padding: 0,
-                    background: heroIdx === i ? G.y500 : 'rgba(255,255,255,.35)',
-                    transition: 'all .35s ease',
+                    minHeight: '30px'
                   }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+                >
+                  {showAllFilters ? 'Less ↑' : 'All ↓'}
+                </button>
+              </div>
 
-        {/* scroll hint - hide on mobile */}
-        {!isMobile && (
-          <div style={{
-            position: 'absolute',
-            bottom: 24,
-            right: 48,
-            color: 'rgba(255,255,255,.4)',
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '.1em',
-            transform: 'rotate(90deg)',
-            transformOrigin: 'right center'
-          }}>
-            SCROLL ↓
+              {/* Filter chips - 2 rows max when collapsed, all when expanded */}
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 6,
+                maxHeight: showAllFilters ? 'none' : '64px',
+                overflow: showAllFilters ? 'visible' : 'hidden',
+                padding: '0 4px'
+              }}>
+                {(showAllFilters ? filterChips : filterChips.slice(0, 4)).map(({ label, filter }) => (
+                  <button
+                    key={filter}
+                    onClick={() => nav(`/properties?filter=${filter}`)}
+                    style={{
+                      background: 'rgba(255,255,255,.15)',
+                      border: '1px solid rgba(255,255,255,.25)',
+                      color: '#fff',
+                      borderRadius: 30,
+                      padding: '5px 10px',
+                      fontSize: 10,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      backdropFilter: 'blur(8px)',
+                      boxShadow: '0 1px 4px rgba(0,0,0,.15)',
+                      minHeight: '28px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </section>
 
-      {/* ══ TICKER STRIP ══ */}
-      <div style={{ background: G.y500, padding: '11px 0', overflow: 'hidden' }}>
+      {/* ══ TICKER STRIP - FASTER ANIMATION ON MOBILE ══ */}
+      <div style={{ background: G.y500, padding: '8px 0', overflow: 'hidden' }}>
         <div style={{
           display: 'inline-block',
-          animation: 'ticker 32s linear infinite',
+          animation: `ticker ${isMobile ? '20s' : '32s'} linear infinite`,
           whiteSpace: 'nowrap'
         }}>
           {[...Array(2)].map((_, ri) => (
             <span key={ri}>
-              {['🏡 Fully Furnished', '✓ Verified Sitters', '📋 Flexible Contracts', '🐾 Pet Friendly', '📶 Fast Wifi', '🔧 Maintenance Support', '🎉 Community Events', '🌍 65+ Countries', '⭐ 4.8 Rating'].map(item => (
+              {['🏡 Fully Furnished', '✓ Verified Sitters', '📋 Flexible Contracts', '🐾 Pet Friendly', '📶 Fast Wifi', '🔧 Maintenance', '🎉 Events', '🌍 65+ Countries', '⭐ 4.8 Rating'].map(item => (
                 <span key={item} style={{
-                  marginRight: isMobile ? 32 : 52,
-                  fontSize: isMobile ? 10 : 12,
+                  marginRight: isMobile ? 20 : 52,
+                  fontSize: isMobile ? 9 : 12,
                   fontWeight: 800,
                   color: G.g900,
-                  letterSpacing: '.06em',
+                  letterSpacing: '.04em',
                   textTransform: 'uppercase'
                 }}>
                   {item}
@@ -1490,56 +1435,56 @@ export const Home: React.FC = () => {
           margin: '0 auto',
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? 40 : 80,
+          gap: isMobile ? 32 : 80,
           alignItems: 'center'
         }}>
           {/* left */}
           <div style={{ opacity: s1.vis ? 1 : 0, transition: 'opacity 0.6s ease' }}>
-            <span style={{ ...pill(G.g100, G.g700), marginBottom: 12, display: 'inline-flex' }}>ABOUT HOWSITTER</span>
-            <div style={{ width: 48, height: 3, background: G.y500, borderRadius: 2, margin: '12px 0 20px' }} />
+            <span style={{ ...pill(G.g100, G.g700), marginBottom: 8, display: 'inline-flex' }}>ABOUT HOWSITTER</span>
+            <div style={{ width: 40, height: 3, background: G.y500, borderRadius: 2, margin: '10px 0 16px' }} />
             <h2 style={{
-              fontSize: isMobile ? 'clamp(24px, 6vw, 34px)' : 'clamp(26px, 3vw, 44px)',
+              fontSize: isMobile ? 'clamp(22px, 5vw, 28px)' : 'clamp(26px, 3vw, 44px)',
               fontWeight: 900,
               color: G.g900,
               lineHeight: 1.1,
               letterSpacing: '-.03em',
-              marginBottom: 20
+              marginBottom: 16
             }}>
               The most trusted<br />
               <span style={{ color: G.g700 }}>House sitting</span> Network
             </h2>
             <p style={{
-              fontSize: isMobile ? 15 : 16,
+              fontSize: isMobile ? 14 : 16,
               color: G.s500,
-              lineHeight: 1.75,
-              marginBottom: 28,
+              lineHeight: 1.7,
+              marginBottom: 24,
               fontWeight: 500
             }}>
-              We connect verified, background-checked sitters with homeowners who need peace of mind while they're away. Flexible durations, smart matching, and a global community you can trust.
+              We connect verified, background-checked sitters with homeowners who need peace of mind while they're away.
             </p>
 
             {/* feature chips - responsive grid */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(120px, auto))',
-              gap: 12,
-              marginBottom: 32
+              gap: 8,
+              marginBottom: 28
             }}>
-              {[['🛋️', 'Fully Furnished'], ['🧹', 'Housekeeping'], ['📋', 'Flex Contracts'], ['📶', 'Fast Wifi'], ['🔧', 'Maintenance'], ['🎉', 'Events & Perks'], ['🐾', 'Pet Friendly'], ['✓', 'ID Verified']].map(([ico, lbl]) => (
+              {[['🛋️', 'Fully Furnished'], ['🧹', 'Housekeeping'], ['📋', 'Flex Contracts'], ['📶', 'Fast Wifi'], ['🔧', 'Maintenance'], ['🎉', 'Events'], ['🐾', 'Pet Friendly'], ['✓', 'ID Verified']].map(([ico, lbl]) => (
                 <div key={lbl} style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 7,
+                  gap: 6,
                   background: G.wh,
                   border: `1.5px solid ${G.s200}`,
-                  borderRadius: 10,
-                  padding: isMobile ? '10px 12px' : '9px 14px',
-                  fontSize: isMobile ? 12 : 13,
+                  borderRadius: 8,
+                  padding: isMobile ? '8px 10px' : '9px 14px',
+                  fontSize: isMobile ? 11 : 13,
                   color: G.s700,
                   fontWeight: 700,
                   boxShadow: '0 1px 4px rgba(0,0,0,.05)'
                 }}>
-                  <span style={{ fontSize: isMobile ? 14 : 16 }}>{ico}</span>
+                  <span style={{ fontSize: isMobile ? 13 : 16 }}>{ico}</span>
                   <span style={{ whiteSpace: isMobile ? 'normal' : 'nowrap' }}>{lbl}</span>
                 </div>
               ))}
@@ -1549,29 +1494,29 @@ export const Home: React.FC = () => {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: isMobile ? 16 : 20,
+              gap: isMobile ? 12 : 20,
               flexWrap: 'wrap'
             }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: isMobile ? 40 : 52, fontWeight: 900, color: G.g900, lineHeight: 1 }}>4.8</span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{ fontSize: isMobile ? 32 : 52, fontWeight: 900, color: G.g900, lineHeight: 1 }}>4.8</span>
                 <div>
                   <div style={{ display: 'flex', gap: 2 }}>
-                    {[1, 2, 3, 4, 5].map(i => <span key={i} style={{ color: G.y500, fontSize: isMobile ? 13 : 15 }}>★</span>)}
+                    {[1, 2, 3, 4, 5].map(i => <span key={i} style={{ color: G.y500, fontSize: isMobile ? 12 : 15 }}>★</span>)}
                   </div>
-                  <div style={{ fontSize: isMobile ? 10 : 12, color: G.s400, fontWeight: 600 }}>from 3,200+ reviews</div>
+                  <div style={{ fontSize: isMobile ? 9 : 12, color: G.s400, fontWeight: 600 }}>from 3,200+ reviews</div>
                 </div>
               </div>
               {[['🏆', 'Best Platform\n2024'], ['🌍', '65+\nCountries'], ['🛡️', 'Verified\nCommunity']].map(([ico, lbl]) => (
                 <div key={lbl} style={{
                   background: G.g100,
                   border: `1.5px solid ${G.g700}`,
-                  borderRadius: 10,
-                  padding: isMobile ? '10px 12px' : '10px 14px',
-                  fontSize: isMobile ? 10 : 11,
+                  borderRadius: 8,
+                  padding: isMobile ? '8px 10px' : '10px 14px',
+                  fontSize: isMobile ? 9 : 11,
                   fontWeight: 800,
                   color: G.g700,
                   textAlign: 'center',
-                  lineHeight: 1.5,
+                  lineHeight: 1.4,
                   whiteSpace: 'pre-line'
                 }}>
                   {ico} {lbl}
@@ -1645,21 +1590,21 @@ export const Home: React.FC = () => {
             flexDirection: isMobile ? 'column' : 'row',
             justifyContent: 'space-between',
             alignItems: isMobile ? 'flex-start' : 'flex-end',
-            marginBottom: 36,
-            gap: isMobile ? 16 : 0
+            marginBottom: 24,
+            gap: isMobile ? 12 : 0
           }}>
             <div>
-              <span style={{ ...pill(G.g100, G.g700), marginBottom: 10, display: 'inline-flex' }}>FEATURED HOMES</span>
-              <div style={{ width: 48, height: 3, background: G.y500, borderRadius: 2, margin: '12px 0 20px' }} />
+              <span style={{ ...pill(G.g100, G.g700), marginBottom: 8, display: 'inline-flex' }}>FEATURED HOMES</span>
+              <div style={{ width: 40, height: 3, background: G.y500, borderRadius: 2, margin: '10px 0 16px' }} />
               <h2 style={{
-                fontSize: isMobile ? 24 : 32,
+                fontSize: isMobile ? 22 : 32,
                 fontWeight: 900,
                 color: G.g900,
                 letterSpacing: '-.03em'
               }}>
                 Love where you live
               </h2>
-              <p style={{ color: G.s400, fontSize: isMobile ? 14 : 15, marginTop: 6, fontWeight: 500 }}>
+              <p style={{ color: G.s400, fontSize: isMobile ? 13 : 15, marginTop: 4, fontWeight: 500 }}>
                 Handpicked homes needing trusted sitters
               </p>
             </div>
@@ -1669,9 +1614,9 @@ export const Home: React.FC = () => {
                 background: 'none',
                 border: `2px solid ${G.g700}`,
                 color: G.g700,
-                borderRadius: 10,
-                padding: isMobile ? '10px 20px' : '10px 22px',
-                fontSize: isMobile ? 13 : 13,
+                borderRadius: 8,
+                padding: isMobile ? '8px 16px' : '10px 22px',
+                fontSize: isMobile ? 12 : 13,
                 fontWeight: 800,
                 cursor: 'pointer',
                 alignSelf: isMobile ? 'flex-start' : 'auto'
@@ -1687,7 +1632,7 @@ export const Home: React.FC = () => {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-                gap: 16,
+                gap: 12,
                 height: isMobile ? 'auto' : 480
               }}>
                 {[...Array(isMobile ? 4 : 5)].map((_, i) => (
@@ -1695,7 +1640,7 @@ export const Home: React.FC = () => {
                     key={i}
                     style={{
                       borderRadius: 16,
-                      height: isMobile ? 200 : (i === 0 && !isMobile ? '100%' : 240),
+                      height: isMobile ? 180 : (i === 0 && !isMobile ? '100%' : 240),
                       background: 'linear-gradient(90deg, #f0f0f0 0%, #e4e4e4 40%, #f0f0f0 80%)',
                       backgroundSize: '600px 100%',
                       animation: 'shimmer 1.6s infinite linear'
@@ -1708,7 +1653,7 @@ export const Home: React.FC = () => {
                 display: 'grid',
                 gridTemplateColumns: isMobile ? '1fr' : (isTablet ? 'repeat(2, 1fr)' : '2fr 1fr 1fr'),
                 gridTemplateRows: isMobile ? 'auto' : '240px 240px',
-                gap: 16
+                gap: 12
               }}>
                 {/* Responsive grid items */}
                 {isMobile ? (
@@ -1742,21 +1687,21 @@ export const Home: React.FC = () => {
               flexDirection: isMobile ? 'column' : 'row',
               justifyContent: 'space-between',
               alignItems: isMobile ? 'flex-start' : 'flex-end',
-              marginBottom: 32,
-              gap: isMobile ? 20 : 0
+              marginBottom: 24,
+              gap: isMobile ? 16 : 0
             }}>
               <div>
-                <span style={{ ...pill(G.g100, G.g700), marginBottom: 10, display: 'inline-flex' }}>BROWSE LISTINGS</span>
-                <div style={{ width: 48, height: 3, background: G.y500, borderRadius: 2, margin: '12px 0 20px' }} />
+                <span style={{ ...pill(G.g100, G.g700), marginBottom: 8, display: 'inline-flex' }}>BROWSE LISTINGS</span>
+                <div style={{ width: 40, height: 3, background: G.y500, borderRadius: 2, margin: '10px 0 16px' }} />
                 <h2 style={{
-                  fontSize: isMobile ? 24 : 32,
+                  fontSize: isMobile ? 22 : 32,
                   fontWeight: 900,
                   color: G.g900,
                   letterSpacing: '-.03em'
                 }}>
                   Browse the best listings
                 </h2>
-                <p style={{ color: G.s400, fontSize: isMobile ? 14 : 15, marginTop: 6, fontWeight: 500 }}>
+                <p style={{ color: G.s400, fontSize: isMobile ? 13 : 15, marginTop: 4, fontWeight: 500 }}>
                   Properties & sitters at special rates
                 </p>
               </div>
@@ -1777,13 +1722,13 @@ export const Home: React.FC = () => {
                     onClick={() => setTab(t)}
                     style={{
                       flex: isMobile ? 1 : 'none',
-                      padding: isMobile ? '14px 16px' : '9px 26px',
+                      padding: isMobile ? '10px 12px' : '9px 26px',
                       borderRadius: 999,
                       border: 'none',
                       background: tab === t ? G.g900 : 'transparent',
                       color: tab === t ? '#fff' : G.s500,
                       fontWeight: 700,
-                      fontSize: isMobile ? 15 : 14,
+                      fontSize: isMobile ? 13 : 14,
                       whiteSpace: 'nowrap',
                       cursor: 'pointer'
                     }}
@@ -1799,9 +1744,9 @@ export const Home: React.FC = () => {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: getPropertyGridCols(),
-                gap: isMobile ? 16 : 20
+                gap: isMobile ? 12 : 20
               }}>
-                {loading ? [...Array(isMobile ? 2 : 6)].map((_, i) => <SkeletonCard key={i} h={isMobile ? 320 : 360} />) :
+                {loading ? [...Array(isMobile ? 2 : 6)].map((_, i) => <SkeletonCard key={i} h={isMobile ? 280 : 360} />) :
                   props.length > 0 ? props.slice(0, isMobile ? 4 : undefined).map((p, i) => (
                     isMobile ? (
                       <PropertyCardMobile
@@ -1831,9 +1776,9 @@ export const Home: React.FC = () => {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: getSitterGridCols(),
-                gap: isMobile ? 16 : 20
+                gap: isMobile ? 12 : 20
               }}>
-                {loading ? [...Array(isMobile ? 2 : 4)].map((_, i) => <SkeletonCard key={i} h={isMobile ? 280 : 320} />) :
+                {loading ? [...Array(isMobile ? 2 : 4)].map((_, i) => <SkeletonCard key={i} h={isMobile ? 240 : 320} />) :
                   sitters.length > 0 ? sitters.slice(0, isMobile ? 3 : undefined).map(s => (
                     isMobile ? (
                       <SitterCardMobile
@@ -1857,15 +1802,15 @@ export const Home: React.FC = () => {
               </div>
             )}
 
-            <div style={{ textAlign: 'center', marginTop: 48 }}>
+            <div style={{ textAlign: 'center', marginTop: 32 }}>
               <button
                 onClick={() => nav(tab === 'properties' ? '/properties' : '/sitters')}
                 style={{
                   background: 'transparent',
                   border: `2px solid ${G.g900}`,
                   borderRadius: 999,
-                  padding: isMobile ? '14px 36px' : '13px 44px',
-                  fontSize: isMobile ? 15 : 14,
+                  padding: isMobile ? '12px 28px' : '13px 44px',
+                  fontSize: isMobile ? 14 : 14,
                   fontWeight: 800,
                   color: G.g900,
                   cursor: 'pointer'
@@ -1888,7 +1833,7 @@ export const Home: React.FC = () => {
           transition: 'opacity 0.6s ease',
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : (isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'),
-          height: isMobile ? 280 : 360
+          height: isMobile ? 200 : 360
         }}>
           {IMGS.lifestyle.slice(0, isMobile ? 1 : (isTablet ? 2 : 3)).map((src, i) => (
             <div key={i} style={{ overflow: 'hidden', position: 'relative' }}>
@@ -1902,11 +1847,11 @@ export const Home: React.FC = () => {
               />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(13,61,36,.5) 100%)' }} />
               {i === (isMobile ? 0 : 1) && (
-                <div style={{ position: 'absolute', bottom: 24, left: 0, right: 0, textAlign: 'center' }}>
-                  <div style={{ color: '#fff', fontSize: isMobile ? 20 : 20, fontWeight: 900, letterSpacing: '-.02em' }}>
+                <div style={{ position: 'absolute', bottom: 16, left: 0, right: 0, textAlign: 'center' }}>
+                  <div style={{ color: '#fff', fontSize: isMobile ? 16 : 20, fontWeight: 900, letterSpacing: '-.02em' }}>
                     Live like a local
                   </div>
-                  <div style={{ color: 'rgba(255,255,255,.7)', fontSize: isMobile ? 13 : 13, fontWeight: 500, marginTop: 6 }}>
+                  <div style={{ color: 'rgba(255,255,255,.7)', fontSize: isMobile ? 12 : 13, fontWeight: 500, marginTop: 4 }}>
                     in 65+ countries worldwide
                   </div>
                 </div>
@@ -1923,19 +1868,19 @@ export const Home: React.FC = () => {
             opacity: s5.vis ? 1 : 0,
             transition: 'opacity 0.6s ease',
             textAlign: 'center',
-            marginBottom: 56
+            marginBottom: 40
           }}>
-            <span style={{ ...pill(G.g100, G.g700), marginBottom: 12, display: 'inline-flex' }}>THE PROCESS</span>
-            <div style={{ width: 48, height: 3, background: G.y500, borderRadius: 2, margin: '12px auto 20px' }} />
+            <span style={{ ...pill(G.g100, G.g700), marginBottom: 8, display: 'inline-flex' }}>THE PROCESS</span>
+            <div style={{ width: 40, height: 3, background: G.y500, borderRadius: 2, margin: '10px auto 16px' }} />
             <h2 style={{
-              fontSize: isMobile ? 24 : 34,
+              fontSize: isMobile ? 22 : 34,
               fontWeight: 900,
               color: G.g900,
               letterSpacing: '-.03em'
             }}>
               How house sitting works
             </h2>
-            <p style={{ color: G.s400, fontSize: isMobile ? 15 : 16, marginTop: 10, fontWeight: 500 }}>
+            <p style={{ color: G.s400, fontSize: isMobile ? 14 : 16, marginTop: 8, fontWeight: 500 }}>
               Three simple steps from discovery to peace of mind
             </p>
           </div>
@@ -1954,7 +1899,7 @@ export const Home: React.FC = () => {
                 key={st.n}
                 style={{
                   background: G.s100,
-                  borderRadius: 20,
+                  borderRadius: 16,
                   overflow: 'hidden',
                   border: `1.5px solid ${G.s200}`,
                   opacity: s5.vis ? 1 : 0,
@@ -1962,7 +1907,7 @@ export const Home: React.FC = () => {
                   boxShadow: '0 2px 8px rgba(0,0,0,.06)',
                 }}
               >
-                <div style={{ height: isMobile ? 160 : 180, overflow: 'hidden' }}>
+                <div style={{ height: isMobile ? 140 : 180, overflow: 'hidden' }}>
                   <img
                     src={st.img}
                     alt={st.title}
@@ -1972,28 +1917,28 @@ export const Home: React.FC = () => {
                     }}
                   />
                 </div>
-                <div style={{ padding: isMobile ? 24 : 28 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <div style={{ padding: isMobile ? 20 : 28 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <div style={{
-                      width: isMobile ? 40 : 42,
-                      height: isMobile ? 40 : 42,
-                      borderRadius: 12,
+                      width: isMobile ? 36 : 42,
+                      height: isMobile ? 36 : 42,
+                      borderRadius: 10,
                       background: G.g100,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: isMobile ? 20 : 22
+                      fontSize: isMobile ? 18 : 22
                     }}>
                       {st.ico}
                     </div>
-                    <div style={{ fontSize: isMobile ? 11 : 11, color: G.g700, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em' }}>
+                    <div style={{ fontSize: isMobile ? 10 : 11, color: G.g700, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em' }}>
                       Step {st.n}
                     </div>
                   </div>
-                  <h3 style={{ fontSize: isMobile ? 18 : 18, fontWeight: 800, color: G.g900, marginBottom: 12 }}>
+                  <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: G.g900, marginBottom: 8 }}>
                     {st.title}
                   </h3>
-                  <p style={{ fontSize: isMobile ? 14 : 14, color: G.s500, lineHeight: 1.7, fontWeight: 500 }}>
+                  <p style={{ fontSize: isMobile ? 13 : 14, color: G.s500, lineHeight: 1.6, fontWeight: 500 }}>
                     {st.desc}
                   </p>
                 </div>
@@ -2004,21 +1949,21 @@ export const Home: React.FC = () => {
       </section>
 
       {/* ══ IMAGE GALLERY STRIP (horizontally scrollable) ══ */}
-      <section ref={s6.ref} style={{ padding: isMobile ? '60px 0 60px 20px' : '80px 0 80px 40px', background: G.s100, overflow: 'hidden' }}>
+      <section ref={s6.ref} style={{ padding: isMobile ? '40px 0 40px 16px' : '80px 0 80px 40px', background: G.s100, overflow: 'hidden' }}>
         <div style={{
           maxWidth: containerMaxWidth,
-          marginBottom: 32,
-          paddingRight: isMobile ? 20 : 40,
+          marginBottom: 24,
+          paddingRight: isMobile ? 16 : 40,
           display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
           justifyContent: 'space-between',
           alignItems: isMobile ? 'flex-start' : 'flex-end',
-          gap: isMobile ? 16 : 0
+          gap: isMobile ? 12 : 0
         }}>
           <div style={{ opacity: s6.vis ? 1 : 0, transition: 'opacity 0.6s ease' }}>
-            <span style={{ ...pill(G.y100, '#92400E'), marginBottom: 10, display: 'inline-flex' }}>PHOTO GALLERY</span>
-            <div style={{ width: 48, height: 3, background: G.y500, borderRadius: 2, margin: '12px 0 20px' }} />
-            <h2 style={{ fontSize: isMobile ? 24 : 30, fontWeight: 900, color: G.g900, letterSpacing: '-.03em' }}>
+            <span style={{ ...pill(G.y100, '#92400E'), marginBottom: 8, display: 'inline-flex' }}>PHOTO GALLERY</span>
+            <div style={{ width: 40, height: 3, background: G.y500, borderRadius: 2, margin: '10px 0 16px' }} />
+            <h2 style={{ fontSize: isMobile ? 22 : 30, fontWeight: 900, color: G.g900, letterSpacing: '-.03em' }}>
               Homes you'll love
             </h2>
           </div>
@@ -2028,9 +1973,9 @@ export const Home: React.FC = () => {
               background: 'none',
               border: `2px solid ${G.s200}`,
               color: G.s700,
-              borderRadius: 10,
-              padding: isMobile ? '10px 20px' : '9px 18px',
-              fontSize: isMobile ? 13 : 13,
+              borderRadius: 8,
+              padding: isMobile ? '8px 16px' : '9px 18px',
+              fontSize: isMobile ? 12 : 13,
               fontWeight: 700,
               cursor: 'pointer'
             }}
@@ -2042,10 +1987,10 @@ export const Home: React.FC = () => {
         {/* horizontally scrollable gallery */}
         <div style={{
           display: 'flex',
-          gap: 16,
+          gap: 12,
           overflowX: 'auto',
-          paddingRight: isMobile ? 20 : 40,
-          paddingBottom: 8,
+          paddingRight: isMobile ? 16 : 40,
+          paddingBottom: 4,
           WebkitOverflowScrolling: 'touch'
         }}>
           {IMGS.properties.slice(0, isMobile ? 6 : 12).map((src, i) => (
@@ -2053,9 +1998,9 @@ export const Home: React.FC = () => {
               key={i}
               onClick={() => props[i] && nav(`/properties/${props[i].id}`)}
               style={{
-                minWidth: isMobile ? (i % 3 === 0 ? 220 : 180) : (i % 3 === 0 ? 300 : 240),
-                height: isMobile ? 160 : 200,
-                borderRadius: 16,
+                minWidth: isMobile ? (i % 3 === 0 ? 180 : 150) : (i % 3 === 0 ? 300 : 240),
+                height: isMobile ? 140 : 200,
+                borderRadius: 12,
                 overflow: 'hidden',
                 flexShrink: 0,
                 cursor: 'pointer',
@@ -2073,15 +2018,16 @@ export const Home: React.FC = () => {
               />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,.55) 0%, transparent 50%)' }} />
               {props[i] && (
-                <div style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}>
-                  <div style={{ color: '#fff', fontWeight: 800, fontSize: isMobile ? 13 : 13 }}>
+                <div style={{ position: 'absolute', bottom: 10, left: 10, right: 10 }}>
+                  <div style={{ color: '#fff', fontWeight: 800, fontSize: isMobile ? 12 : 13 }}>
                     {props[i].title}
                   </div>
                   {props[i].city && (
                     <span style={{
                       ...pill('rgba(255,255,255,.15)', '#fff', {
-                        fontSize: isMobile ? 11 : 11,
-                        backdropFilter: 'blur(4px)'
+                        fontSize: isMobile ? 10 : 11,
+                        backdropFilter: 'blur(4px)',
+                        padding: '2px 6px'
                       })
                     }}>
                       📍 {props[i].city}
@@ -2101,28 +2047,28 @@ export const Home: React.FC = () => {
             opacity: s7.vis ? 1 : 0,
             transition: 'opacity 0.6s ease',
             textAlign: 'center',
-            marginBottom: 40
+            marginBottom: 24
           }}>
-            <span style={{ ...pill(G.y100, '#92400E'), marginBottom: 12, display: 'inline-flex' }}>🌍 GLOBAL NETWORK</span>
-            <div style={{ width: 48, height: 3, background: G.y500, borderRadius: 2, margin: '12px auto 16px' }} />
-            <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: G.g900, letterSpacing: '-.03em' }}>
+            <span style={{ ...pill(G.y100, '#92400E'), marginBottom: 8, display: 'inline-flex' }}>🌍 GLOBAL NETWORK</span>
+            <div style={{ width: 40, height: 3, background: G.y500, borderRadius: 2, margin: '10px auto 12px' }} />
+            <h2 style={{ fontSize: isMobile ? 22 : 32, fontWeight: 900, color: G.g900, letterSpacing: '-.03em' }}>
               House sitting, everywhere
             </h2>
-            <p style={{ color: G.s400, fontSize: isMobile ? 15 : 15, marginTop: 8, fontWeight: 500 }}>
+            <p style={{ color: G.s400, fontSize: isMobile ? 14 : 15, marginTop: 6, fontWeight: 500 }}>
               Properties and sitters across 65+ countries
             </p>
           </div>
           <div style={{
-            borderRadius: 22,
+            borderRadius: 16,
             overflow: 'hidden',
             border: `1.5px solid ${G.s200}`,
             boxShadow: '0 8px 40px rgba(0,0,0,.08)',
-            height: isMobile ? 320 : 460
+            height: isMobile ? 240 : 460
           }}>
-            <WorldMap showProperties showSitters height={isMobile ? "320px" : "460px"} />
+            <WorldMap showProperties showSitters height={isMobile ? "240px" : "460px"} />
           </div>
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Link to="/world-map" style={{ color: G.g700, fontWeight: 800, fontSize: isMobile ? 14 : 14, textDecoration: 'none' }}>
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <Link to="/world-map" style={{ color: G.g700, fontWeight: 800, fontSize: isMobile ? 13 : 14, textDecoration: 'none' }}>
               Explore full map →
             </Link>
           </div>
@@ -2149,16 +2095,16 @@ export const Home: React.FC = () => {
             opacity: s8.vis ? 1 : 0,
             transition: 'opacity 0.6s ease',
             textAlign: 'center',
-            marginBottom: isMobile ? 40 : 52
+            marginBottom: isMobile ? 32 : 52
           }}>
-            <span style={{ ...pill(G.y500, G.g900), marginBottom: 14, display: 'inline-flex' }}>COMMUNITY STORIES</span>
-            <div style={{ width: 48, height: 3, background: 'rgba(255,255,255,.2)', borderRadius: 2, margin: '12px auto 18px' }} />
-            <h2 style={{ fontSize: isMobile ? 24 : 34, fontWeight: 900, color: '#fff', letterSpacing: '-.03em' }}>
+            <span style={{ ...pill(G.y500, G.g900), marginBottom: 10, display: 'inline-flex' }}>COMMUNITY STORIES</span>
+            <div style={{ width: 40, height: 3, background: 'rgba(255,255,255,.2)', borderRadius: 2, margin: '10px auto 14px' }} />
+            <h2 style={{ fontSize: isMobile ? 22 : 34, fontWeight: 900, color: '#fff', letterSpacing: '-.03em' }}>
               Trusted by thousands worldwide
             </h2>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-              {[1, 2, 3, 4, 5].map(i => <span key={i} style={{ color: G.y500, fontSize: isMobile ? 16 : 17 }}>★</span>)}
-              <span style={{ fontSize: isMobile ? 14 : 14, color: 'rgba(255,255,255,.5)', marginLeft: 6, fontWeight: 600 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
+              {[1, 2, 3, 4, 5].map(i => <span key={i} style={{ color: G.y500, fontSize: isMobile ? 14 : 17 }}>★</span>)}
+              <span style={{ fontSize: isMobile ? 13 : 14, color: 'rgba(255,255,255,.5)', marginLeft: 4, fontWeight: 600 }}>
                 4.8 · 3,200+ reviews
               </span>
             </div>
@@ -2167,7 +2113,7 @@ export const Home: React.FC = () => {
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : (isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'),
-            gap: isMobile ? 20 : 24
+            gap: isMobile ? 16 : 24
           }}>
             {[
               { name: 'Sarah Chen', role: 'Homeowner · Nairobi', flag: '🇰🇪', q: 'Found the perfect sitter for my 3-month trip. Daily updates gave me complete peace of mind.' },
@@ -2177,25 +2123,25 @@ export const Home: React.FC = () => {
               <div key={i} style={{
                 background: 'rgba(255,255,255,.06)',
                 backdropFilter: 'blur(8px)',
-                borderRadius: 20,
-                padding: isMobile ? 24 : 30,
+                borderRadius: 16,
+                padding: isMobile ? 20 : 30,
                 border: '1.5px solid rgba(255,255,255,.1)',
                 opacity: s8.vis ? 1 : 0,
                 transition: 'opacity 0.6s ease',
               }}>
-                <div style={{ display: 'flex', gap: 2, marginBottom: 16 }}>
-                  {[1, 2, 3, 4, 5].map(j => <span key={j} style={{ color: G.y500, fontSize: isMobile ? 14 : 14 }}>★</span>)}
+                <div style={{ display: 'flex', gap: 2, marginBottom: 12 }}>
+                  {[1, 2, 3, 4, 5].map(j => <span key={j} style={{ color: G.y500, fontSize: isMobile ? 13 : 14 }}>★</span>)}
                 </div>
-                <p style={{ fontSize: isMobile ? 14 : 15, color: 'rgba(255,255,255,.8)', lineHeight: 1.72, marginBottom: 24, fontWeight: 500, fontStyle: 'italic' }}>
+                <p style={{ fontSize: isMobile ? 13 : 15, color: 'rgba(255,255,255,.8)', lineHeight: 1.7, marginBottom: 20, fontWeight: 500, fontStyle: 'italic' }}>
                   "{t.q}"
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: isMobile ? 44 : 46, height: isMobile ? 44 : 46, borderRadius: '50%', background: G.g100, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? 22 : 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: isMobile ? 40 : 46, height: isMobile ? 40 : 46, borderRadius: '50%', background: G.g100, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? 20 : 24 }}>
                     {t.flag}
                   </div>
                   <div>
-                    <div style={{ color: '#fff', fontWeight: 800, fontSize: isMobile ? 14 : 14 }}>{t.name}</div>
-                    <div style={{ color: 'rgba(255,255,255,.45)', fontSize: isMobile ? 12 : 12, fontWeight: 500 }}>{t.role}</div>
+                    <div style={{ color: '#fff', fontWeight: 800, fontSize: isMobile ? 13 : 14 }}>{t.name}</div>
+                    <div style={{ color: 'rgba(255,255,255,.45)', fontSize: isMobile ? 11 : 12, fontWeight: 500 }}>{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -2206,7 +2152,7 @@ export const Home: React.FC = () => {
 
       {/* ══ CTA BANNER ══ */}
       <section style={{
-        padding: isMobile ? '80px 20px' : '100px 40px',
+        padding: isMobile ? '60px 16px' : '100px 40px',
         background: G.y500,
         position: 'relative',
         overflow: 'hidden'
@@ -2218,24 +2164,24 @@ export const Home: React.FC = () => {
           position: 'relative',
           zIndex: 1
         }}>
-          <span style={{ ...pill('rgba(13,61,36,.12)', G.g900), marginBottom: 20, display: 'inline-flex' }}>
+          <span style={{ ...pill('rgba(13,61,36,.12)', G.g900), marginBottom: 16, display: 'inline-flex' }}>
             GET STARTED
           </span>
           <h2 style={{
-            fontSize: isMobile ? 'clamp(26px, 8vw, 34px)' : 'clamp(30px, 4vw, 52px)',
+            fontSize: isMobile ? 'clamp(24px, 7vw, 28px)' : 'clamp(30px, 4vw, 52px)',
             fontWeight: 900,
             color: G.g900,
-            marginBottom: 20,
+            marginBottom: 16,
             letterSpacing: '-.04em',
-            lineHeight: 1.08
+            lineHeight: 1.1
           }}>
             Ready to find your<br />perfect match?
           </h2>
           <p style={{
-            fontSize: isMobile ? 16 : 17,
+            fontSize: isMobile ? 15 : 17,
             color: 'rgba(13,61,36,.7)',
-            marginBottom: isMobile ? 36 : 44,
-            lineHeight: 1.65,
+            marginBottom: isMobile ? 28 : 44,
+            lineHeight: 1.6,
             fontWeight: 600
           }}>
             Join thousands of homeowners and sitters who trust Howsitter for secure, flexible, stress-free arrangements.
@@ -2244,8 +2190,8 @@ export const Home: React.FC = () => {
             display: 'flex',
             flexDirection: isMobile ? 'column' : 'row',
             justifyContent: 'center',
-            gap: 16,
-            marginBottom: 40
+            gap: 12,
+            marginBottom: 32
           }}>
             <button
               onClick={() => nav('/properties')}
@@ -2253,9 +2199,9 @@ export const Home: React.FC = () => {
                 background: G.g900,
                 color: '#fff',
                 border: 'none',
-                borderRadius: 12,
-                padding: isMobile ? '16px 36px' : '18px 44px',
-                fontSize: isMobile ? 16 : 15,
+                borderRadius: 10,
+                padding: isMobile ? '14px 28px' : '18px 44px',
+                fontSize: isMobile ? 15 : 15,
                 fontWeight: 900,
                 boxShadow: '0 10px 32px rgba(13,61,36,.35)',
                 cursor: 'pointer',
@@ -2270,9 +2216,9 @@ export const Home: React.FC = () => {
                 background: '#fff',
                 color: G.g900,
                 border: `2px solid ${G.g900}`,
-                borderRadius: 12,
-                padding: isMobile ? '16px 36px' : '18px 44px',
-                fontSize: isMobile ? 16 : 15,
+                borderRadius: 10,
+                padding: isMobile ? '14px 28px' : '18px 44px',
+                fontSize: isMobile ? 15 : 15,
                 fontWeight: 900,
                 cursor: 'pointer',
                 width: isMobile ? '100%' : 'auto'
@@ -2284,45 +2230,45 @@ export const Home: React.FC = () => {
           <div style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: isMobile ? 32 : 48,
+            gap: isMobile ? 28 : 48,
             flexWrap: 'wrap'
           }}>
             {[['4.8★', 'Avg Rating'], ['98%', 'Satisfaction'], ['24/7', 'Support']].map(([v, l]) => (
               <div key={l} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: isMobile ? 22 : 24, fontWeight: 900, color: G.g900 }}>{v}</div>
-                <div style={{ fontSize: isMobile ? 12 : 12, color: 'rgba(13,61,36,.55)', fontWeight: 700 }}>{l}</div>
+                <div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 900, color: G.g900 }}>{v}</div>
+                <div style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(13,61,36,.55)', fontWeight: 700 }}>{l}</div>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: isMobile ? 12 : 12, color: 'rgba(13,61,36,.45)', marginTop: 28, fontWeight: 600 }}>
+          <p style={{ fontSize: isMobile ? 11 : 12, color: 'rgba(13,61,36,.45)', marginTop: 24, fontWeight: 600 }}>
             No credit card · Free to browse · Verified community
           </p>
         </div>
       </section>
 
       {/* ══ FOOTER ══ */}
-      <footer style={{ background: '#0A1628', padding: isMobile ? '60px 20px 24px' : '70px 40px 32px', fontFamily: G.f }}>
+      <footer style={{ background: '#0A1628', padding: isMobile ? '48px 16px 20px' : '70px 40px 32px', fontFamily: G.f }}>
         <div style={{ maxWidth: containerMaxWidth, margin: '0 auto' }}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : (isTablet ? 'repeat(2, 1fr)' : '2.4fr 1fr 1fr 1fr'),
-            gap: isMobile ? 40 : 48,
-            marginBottom: 48
+            gap: isMobile ? 32 : 48,
+            marginBottom: 32
           }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-                <svg width="30" height="30" viewBox="0 0 34 34" fill="none">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
                   <rect width="34" height="34" rx="9" fill={G.y500} />
                   <path d="M17 7L8 14v13h6v-8h6v8h6V14z" fill={G.g900} />
                 </svg>
-                <span style={{ color: '#fff', fontWeight: 900, fontSize: 16 }}>howsitter</span>
+                <span style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>howsitter</span>
               </div>
-              <p style={{ color: 'rgba(255,255,255,.35)', fontSize: 14, lineHeight: 1.72, maxWidth: 260, marginBottom: 24, fontWeight: 500 }}>
+              <p style={{ color: 'rgba(255,255,255,.35)', fontSize: 13, lineHeight: 1.7, maxWidth: 260, marginBottom: 20, fontWeight: 500 }}>
                 Connecting verified house sitters with homeowners worldwide. Flexible, secure arrangements with genuine peace of mind.
               </p>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {['🇰🇪', '🇬🇧', '🇺🇸', '🇦🇺', '🇸🇬', '🇿🇦'].map(f => (
-                  <span key={f} style={{ fontSize: 22, cursor: 'pointer', opacity: .6 }}>{f}</span>
+                  <span key={f} style={{ fontSize: 20, cursor: 'pointer', opacity: .6 }}>{f}</span>
                 ))}
               </div>
             </div>
@@ -2332,22 +2278,22 @@ export const Home: React.FC = () => {
               { head: 'Legal', links: ['Privacy Policy', 'Terms of Use', 'Safety', 'Cookie Policy', 'Contact'] },
             ].map(col => (
               <div key={col.head}>
-                <div style={{ color: 'rgba(255,255,255,.6)', fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 18 }}>
+                <div style={{ color: 'rgba(255,255,255,.6)', fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 16 }}>
                   {col.head}
                 </div>
                 {col.links.map(l => (
-                  <div key={l} style={{ color: 'rgba(255,255,255,.35)', fontSize: 14, marginBottom: 12, cursor: 'pointer', fontWeight: 500 }}>
+                  <div key={l} style={{ color: 'rgba(255,255,255,.35)', fontSize: 13, marginBottom: 10, cursor: 'pointer', fontWeight: 500 }}>
                     {l}
                   </div>
                 ))}
               </div>
             ))}
           </div>
-          <div style={{ borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 24, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', gap: isMobile ? 16 : 0 }}>
-            <span style={{ color: 'rgba(255,255,255,.22)', fontSize: 13, fontWeight: 500 }}>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 20, display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', gap: isMobile ? 12 : 0 }}>
+            <span style={{ color: 'rgba(255,255,255,.22)', fontSize: 12, fontWeight: 500 }}>
               © 2025 Howsitter. All rights reserved.
             </span>
-            <span style={{ color: 'rgba(255,255,255,.22)', fontSize: 13, fontWeight: 500 }}>
+            <span style={{ color: 'rgba(255,255,255,.22)', fontSize: 12, fontWeight: 500 }}>
               Made with ♥ by the Howsitter team
             </span>
           </div>
@@ -2404,51 +2350,33 @@ export const Home: React.FC = () => {
           box-shadow: 0 20px 48px rgba(0,0,0,.13) !important;
         }
         
-        /* Hide scrollbar but keep functionality */
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        
-        /* Ensure proper spacing on mobile */
+        /* MOBILE OPTIMIZATIONS */
         @media (max-width: 768px) {
-          .hero-search-container {
-            padding-bottom: 20px !important;
-            margin-bottom: 12px !important;
-          }
-          
-          /* Add gradient fade to indicate scrolling */
-          .filters-scroll-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 50px;
-            background: linear-gradient(to right, transparent, rgba(13,61,36,.9));
-            pointer-events: none;
-            border-radius: 0 16px 16px 0;
+          /* Reduce all font sizes slightly */
+          body {
+            font-size: 14px;
           }
           
           /* Better touch targets */
           button, a, [role="button"] {
-            min-height: 48px;
+            min-height: 44px;
           }
           
-          /* Improve readability */
-          p, li, span {
-            font-size: 16px;
-            line-height: 1.6;
-          }
-          
-          /* Better spacing for stacked elements */
+          /* Reduce spacing */
           .section-content {
-            padding-left: 20px;
-            padding-right: 20px;
+            padding-left: 16px;
+            padding-right: 16px;
+          }
+          
+          /* Prevent text overflow */
+          h1, h2, h3, p {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+          }
+          
+          /* Smooth scrolling for filter chips */
+          .filters-scroll {
+            -webkit-overflow-scrolling: touch;
           }
         }
         
@@ -2461,19 +2389,6 @@ export const Home: React.FC = () => {
         /* Smooth scrolling */
         html {
           scroll-behavior: smooth;
-        }
-        
-        /* Better touch feedback */
-        @media (hover: none) {
-          .hs-card:active {
-            opacity: 0.8;
-            transition: opacity 0.1s ease;
-          }
-          
-          button:active {
-            transform: scale(0.97);
-            transition: transform 0.1s ease;
-          }
         }
       `}</style>
     </div>
