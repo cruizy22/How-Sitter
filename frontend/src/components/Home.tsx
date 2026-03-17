@@ -1068,7 +1068,7 @@ export const Home: React.FC = () => {
       )}
 
       {/* ══ HERO — Responsive full-bleed ══ */}
-/* ══ HERO — Responsive full-bleed ══ */
+
 <section style={{
   position: 'relative',
   height: heroHeight,
@@ -1369,6 +1369,32 @@ export const Home: React.FC = () => {
         ))}
       </div>
 
+      {/* ══ TICKER STRIP ══ */}
+      <div style={{ background: G.y500, padding: isMobile ? '8px 0' : '11px 0', overflow: 'hidden' }}>
+        <div style={{
+          display: 'inline-block',
+          animation: `ticker ${isMobile ? '24s' : '32s'} linear infinite`,
+          whiteSpace: 'nowrap'
+        }}>
+          {[...Array(2)].map((_, ri) => (
+            <span key={ri}>
+              {['🏡 Fully Furnished', '✓ Verified Sitters', '📋 Flexible Contracts', '🐾 Pet Friendly', '📶 Fast Wifi', '🔧 Maintenance Support', '🎉 Community Events', '🌍 65+ Countries', '⭐ 4.8 Rating'].map(item => (
+                <span key={item} style={{
+                  marginRight: isMobile ? 20 : 52,
+                  fontSize: isMobile ? 9 : 12,
+                  fontWeight: 800,
+                  color: G.g900,
+                  letterSpacing: '.04em',
+                  textTransform: 'uppercase'
+                }}>
+                  {item}
+                </span>
+              ))}
+            </span>
+          ))}
+        </div>
+      </div>
+      
       {/* Hint for scrolling */}
       {isMobile && (
         <div style={{
@@ -1401,31 +1427,7 @@ export const Home: React.FC = () => {
   )}
 </section>
 
-      {/* ══ TICKER STRIP ══ */}
-      <div style={{ background: G.y500, padding: isMobile ? '8px 0' : '11px 0', overflow: 'hidden' }}>
-        <div style={{
-          display: 'inline-block',
-          animation: `ticker ${isMobile ? '24s' : '32s'} linear infinite`,
-          whiteSpace: 'nowrap'
-        }}>
-          {[...Array(2)].map((_, ri) => (
-            <span key={ri}>
-              {['🏡 Fully Furnished', '✓ Verified Sitters', '📋 Flexible Contracts', '🐾 Pet Friendly', '📶 Fast Wifi', '🔧 Maintenance Support', '🎉 Community Events', '🌍 65+ Countries', '⭐ 4.8 Rating'].map(item => (
-                <span key={item} style={{
-                  marginRight: isMobile ? 20 : 52,
-                  fontSize: isMobile ? 9 : 12,
-                  fontWeight: 800,
-                  color: G.g900,
-                  letterSpacing: '.04em',
-                  textTransform: 'uppercase'
-                }}>
-                  {item}
-                </span>
-              ))}
-            </span>
-          ))}
-        </div>
-      </div>
+
 
       {/* ══ HERO TAGLINE + FEATURE CHIPS ══ */}
       <section ref={s1.ref} style={{ padding: sectionPadding, background: G.s100 }}>
