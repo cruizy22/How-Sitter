@@ -41,7 +41,7 @@ const G = {
   s200: '#E5E7EB',
   s100: '#F9FAFB',
   wh: '#FFFFFF',
-  f: "'Nunito', sans-serif',
+  f: "'Nunito', sans-serif'",
 };
 
 /* ─── curated Unsplash images ─── */
