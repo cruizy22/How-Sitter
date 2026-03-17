@@ -44,8 +44,6 @@ const G = {
   f: "'Nunito', sans-serif'",
 };
 
-
-
 /* ─── curated Unsplash images ─── */
 const IMGS = {
   hero: [
@@ -899,7 +897,7 @@ const EmptyState: React.FC<{ icon: string; msg: string; onRetry: () => void; isM
 );
 
 /* ══════════════════════════════════════════
-   HOME Main Component - RESPONSIVE FIXES ONLY
+   HOME Main Component - FIXED HEADER SPACING
 ══════════════════════════════════════════ */
 export const Home: React.FC = () => {
   const nav = useNavigate();
@@ -917,11 +915,12 @@ export const Home: React.FC = () => {
   const [heroAnim, setHeroAnim] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Responsive values - OPTIMIZED
-  const heroHeight = isMobile ? 420 : isTablet ? 540 : 640; // Reduced from 500 to 420
-  const sectionPadding = isMobile ? '40px 16px' : isTablet ? '60px 24px' : '80px 40px'; // Reduced
+  // Responsive values - OPTIMIZED WITH HEADER SPACING
+  const headerHeight = isMobile ? 60 : 80; // Fixed header height
+  const heroHeight = isMobile ? 520 : isTablet ? 600 : 640; // Increased to account for header
+  const sectionPadding = isMobile ? '40px 16px' : isTablet ? '60px 24px' : '80px 40px';
   const containerMaxWidth = isMobile ? '100%' : isTablet ? '720px' : '1180px';
-  const gridGap = isMobile ? '12px' : isTablet ? '20px' : '24px'; // Reduced
+  const gridGap = isMobile ? '12px' : isTablet ? '20px' : '24px';
 
   /* auto-advance hero */
   useEffect(() => {
@@ -1020,6 +1019,100 @@ export const Home: React.FC = () => {
       width: '100%',
       maxWidth: '100vw'
     }}>
+      {/* ══ FIXED HEADER - Always visible with proper spacing ══ */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: headerHeight,
+        background: isMobile ? 'rgba(255,255,255,.98)' : 'transparent',
+        backdropFilter: isMobile ? 'blur(10px)' : 'none',
+        borderBottom: isMobile ? `1px solid ${G.s200}` : 'none',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        padding: isMobile ? '0 16px' : '0 40px',
+      }}>
+        <div style={{
+          maxWidth: containerMaxWidth,
+          margin: '0 auto',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => nav('/')}>
+            <svg width={isMobile ? 28 : 32} height={isMobile ? 28 : 32} viewBox="0 0 34 34" fill="none">
+              <rect width="34" height="34" rx="9" fill={G.y500} />
+              <path d="M17 7L8 14v13h6v-8h6v8h6V14z" fill={G.g900} />
+            </svg>
+            <span style={{
+              fontWeight: 900,
+              fontSize: isMobile ? 16 : 18,
+              color: isMobile ? G.g900 : '#fff',
+            }}>howsitter</span>
+          </div>
+
+          {/* Desktop Navigation */}
+          {!isMobile && (
+            <nav style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+              {['Properties', 'Sitters', 'How It Works'].map(item => (
+                <button
+                  key={item}
+                  onClick={() => nav(`/${item.toLowerCase().replace(' ', '-')}`)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: '8px 0',
+                  }}
+                >
+                  {item}
+                </button>
+              ))}
+              <button
+                onClick={() => nav('/login')}
+                style={{
+                  background: 'rgba(255,255,255,.15)',
+                  border: '1.5px solid rgba(255,255,255,.3)',
+                  color: '#fff',
+                  borderRadius: 30,
+                  padding: '8px 20px',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
+                Sign In
+              </button>
+            </nav>
+          )}
+
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: 24,
+                cursor: 'pointer',
+                padding: 8,
+                color: G.g900,
+              }}
+            >
+              ☰
+            </button>
+          )}
+        </div>
+      </header>
+
       {/* ══ MOBILE MENU ══ */}
       {isMobile && mobileMenuOpen && (
         <div style={{
@@ -1029,9 +1122,9 @@ export const Home: React.FC = () => {
           right: 0,
           bottom: 0,
           background: G.wh,
-          zIndex: 1000,
-          padding: '16px',
-          overflowY: 'auto'
+          zIndex: 2000,
+          padding: `${headerHeight + 16}px 16px 16px 16px`,
+          overflowY: 'auto',
         }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
             <button
@@ -1042,7 +1135,7 @@ export const Home: React.FC = () => {
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {['Properties', 'Sitters', 'How It Works', 'Community', 'Corporate'].map(item => (
+            {['Properties', 'Sitters', 'How It Works', 'Community', 'Corporate', 'Login', 'Sign Up'].map(item => (
               <button
                 key={item}
                 onClick={() => {
@@ -1050,7 +1143,7 @@ export const Home: React.FC = () => {
                   setMobileMenuOpen(false);
                 }}
                 style={{
-                  padding: '14px',
+                  padding: '16px',
                   fontSize: '16px',
                   fontWeight: 600,
                   background: 'none',
@@ -1067,307 +1160,351 @@ export const Home: React.FC = () => {
         </div>
       )}
 
-      {/* ══ HERO — Responsive full-bleed ══ */}
-
-<section style={{
-  position: 'relative',
-  height: heroHeight,
-  overflow: 'hidden'
-}}>
-  {/* background image */}
-  <div style={{ position: 'absolute', inset: 0 }}>
-    <img
-      key={heroIdx}
-      src={IMGS.hero[heroIdx]}
-      alt="hero"
-      style={{
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        opacity: heroAnim ? 1 : 0,
-        transition: 'opacity .8s ease',
-        transform: isMobile ? 'scale(1.1)' : 'none'
-      }}
-      onError={e => {
-        (e.target as HTMLImageElement).src = IMGS.hero[0];
-      }}
-    />
-  </div>
-
-  {/* gradient overlay */}
-  <div style={{
-    position: 'absolute',
-    inset: 0,
-    background: 'linear-gradient(to bottom, rgba(13,61,36,.55) 0%, rgba(13,61,36,.72) 55%, rgba(13,61,36,.92) 100%)'
-  }} />
-
-  {/* content - FIXED POSITIONING */}
-  <div style={{
-    position: 'relative',
-    zIndex: 2,
-    maxWidth: containerMaxWidth,
-    margin: '0 auto',
-    padding: isMobile ? '80px 12px 20px' : '0 40px', // Added top padding for mobile
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    overflowY: isMobile ? 'auto' : 'visible', // Allow scrolling if content overflows
-  }}>
-    {/* sub-label */}
-    <div style={{ marginBottom: isMobile ? 8 : 16 }}>
-      <span style={{
-        ...pill('rgba(245,166,35,.2)', G.y500),
-        border: '1.5px solid rgba(245,166,35,.45)',
-        fontSize: isMobile ? 9 : 12,
-        padding: isMobile ? '3px 8px' : '4px 12px',
-        display: 'inline-block' // Ensures it stays visible
+      {/* ══ HERO — With header spacing ══ */}
+      <section style={{
+        position: 'relative',
+        height: heroHeight,
+        overflow: 'hidden',
+        marginTop: 0, // No margin, padding handles it
       }}>
-        ✦ TRUSTED HOUSE SITTING · 65+ COUNTRIES
-      </span>
-    </div>
-
-    {/* headline - REDUCED SIZE */}
-    <h1 style={{
-      fontSize: isMobile ? 'clamp(20px, 6vw, 24px)' : 'clamp(38px, 5.5vw, 68px)',
-      fontWeight: 900,
-      color: '#fff',
-      lineHeight: 1.2,
-      letterSpacing: '-.04em',
-      maxWidth: isMobile ? '100%' : 720,
-      marginBottom: isMobile ? 8 : 20
-    }}>
-      Your home,<br />
-      <span style={{ color: G.y500 }}>Beautifully Cared for.</span>
-    </h1>
-
-    {/* description - HIDE ON SMALL MOBILE */}
-    <p style={{
-      fontSize: isMobile ? (window.innerWidth < 360 ? 0 : 14) : 17, // Hide on very small screens
-      color: 'rgba(255,255,255,.72)',
-      maxWidth: isMobile ? '100%' : 500,
-      lineHeight: 1.65,
-      marginBottom: isMobile ? 12 : 36,
-      fontWeight: 500,
-      display: isMobile && window.innerWidth < 360 ? 'none' : 'block' // Hide on very small screens
-    }}>
-      Connect with verified house Sitters and Listers worldwide. Secure, flexible arrangements — monthly or nightly.
-    </p>
-
-    {/* search card - COMPACT */}
-    <div style={{ 
-      maxWidth: isMobile ? '100%' : 820,
-      marginBottom: isMobile ? '12px' : 0,
-    }}>
-      {/* stay toggle */}
-      <div style={{
-        display: 'flex',
-        marginBottom: 0,
-        overflowX: isMobile ? 'auto' : 'visible',
-        WebkitOverflowScrolling: 'touch',
-        paddingBottom: isMobile ? '2px' : 0,
-        gap: '2px'
-      }}>
-        {(['Monthly', 'Nightly'] as const).map(m => (
-          <button
-            key={m}
-            onClick={() => setStayMode(m)}
-            style={{
-              padding: isMobile ? '6px 12px' : '10px 24px',
-              borderRadius: '12px 12px 0 0',
-              fontSize: isMobile ? 11 : 13,
-              fontWeight: 700,
-              background: stayMode === m ? '#fff' : 'rgba(255,255,255,.15)',
-              color: stayMode === m ? G.g800 : 'rgba(255,255,255,.75)',
-              border: 'none',
-              marginRight: 0,
-              whiteSpace: 'nowrap',
-              cursor: 'pointer'
-            }}
-          >
-            {m}
-          </button>
-        ))}
-      </div>
-
-      {/* Mobile search form */}
-      {isMobile ? (
-        <form onSubmit={handleSearch} style={{
-          background: '#fff',
-          borderRadius: '12px',
-          overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(0,0,0,.25)',
-          padding: '10px', // Reduced padding
-          margin: '8px 0 12px 0',
-        }}>
-          <div style={{ marginBottom: '8px' }}>
-            <div style={{ fontSize: 8, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 2 }}>Location</div>
-            <select
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px', // Reduced padding
-                border: `1px solid ${G.s200}`,
-                borderRadius: '6px',
-                fontSize: 12,
-                color: G.s900,
-                fontWeight: 600,
-                background: G.wh
-              }}
-            >
-              <option value="">Select location</option>
-              {['Nairobi', 'London', 'Sydney', 'New York', 'Dubai', 'Singapore', 'Cape Town', 'Paris', 'Toronto', 'Tokyo'].map(l => <option key={l}>{l}</option>)}
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '8px' }}>
-            <div style={{ fontSize: 8, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 2 }}>
-              {stayMode === 'Monthly' ? 'Monthly budget' : 'Nightly rate'}
-            </div>
-            <select
-              value={budget}
-              onChange={e => setBudget(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: `1px solid ${G.s200}`,
-                borderRadius: '6px',
-                fontSize: 12,
-                color: G.s900,
-                fontWeight: 600,
-                background: G.wh
-              }}
-            >
-              <option value="">Set budget</option>
-              {(stayMode === 'Monthly'
-                ? ['Under $1,000', '$1,000–$1,500', '$1,500–$2,000', '$2,000–$3,000', '$3,000+']
-                : ['Under $80', '$80–$120', '$120–$180', '$180–$250', '$250+']
-              ).map(b => <option key={b}>{b}</option>)}
-            </select>
-          </div>
-
-          <button
-            type="submit"
+        {/* background image */}
+        <div style={{ position: 'absolute', inset: 0 }}>
+          <img
+            key={heroIdx}
+            src={IMGS.hero[heroIdx]}
+            alt="hero"
             style={{
               width: '100%',
-              background: G.g700,
-              color: '#fff',
-              border: 'none',
-              padding: '10px',
-              fontSize: 13,
-              fontWeight: 900,
-              borderRadius: '6px',
-              cursor: 'pointer'
+              height: '100%',
+              objectFit: 'cover',
+              opacity: heroAnim ? 1 : 0,
+              transition: 'opacity .8s ease',
+              transform: isMobile ? 'scale(1.1)' : 'none'
             }}
-          >
-            Check availability
-          </button>
-        </form>
-      ) : (
-        /* Desktop search form */
-        <form onSubmit={handleSearch} style={{
-          background: '#fff',
-          borderRadius: '0 16px 16px 16px',
-          overflow: 'hidden',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr auto',
-          boxShadow: '0 16px 64px rgba(0,0,0,.35)',
-          marginBottom: '20px',
-        }}>
-          {/* location */}
-          <div style={{ padding: '16px 24px', borderRight: `1px solid ${G.s200}` }}>
-            <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>Location</div>
-            <select
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              style={{ width: '100%', border: 'none', fontSize: 15, color: G.s900, fontWeight: 700, background: 'transparent' }}
-            >
-              <option value="">Select location</option>
-              {['Nairobi', 'London', 'Sydney', 'New York', 'Dubai', 'Singapore', 'Cape Town', 'Paris', 'Toronto', 'Tokyo'].map(l => <option key={l}>{l}</option>)}
-            </select>
-          </div>
-          {/* budget */}
-          <div style={{ padding: '16px 24px', borderRight: `1px solid ${G.s200}` }}>
-            <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>
-              {stayMode === 'Monthly' ? 'Monthly budget' : 'Nightly rate'}
-            </div>
-            <select
-              value={budget}
-              onChange={e => setBudget(e.target.value)}
-              style={{ width: '100%', border: 'none', fontSize: 15, color: G.s900, fontWeight: 700, background: 'transparent' }}
-            >
-              <option value="">Set budget</option>
-              {(stayMode === 'Monthly'
-                ? ['Under $1,000', '$1,000–$1,500', '$1,500–$2,000', '$2,000–$3,000', '$3,000+']
-                : ['Under $80', '$80–$120', '$120–$180', '$180–$250', '$250+']
-              ).map(b => <option key={b}>{b}</option>)}
-            </select>
-          </div>
-          <button type="submit" style={{
-            background: G.g700,
-            color: '#fff',
-            border: 'none',
-            padding: '0 36px',
-            fontSize: 14,
-            fontWeight: 900,
-            letterSpacing: '.01em',
-            cursor: 'pointer'
-          }}>
-            Check availability
-          </button>
-        </form>
-      )}
+            onError={e => {
+              (e.target as HTMLImageElement).src = IMGS.hero[0];
+            }}
+          />
+        </div>
 
-      {/* quick filters */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        marginTop: 8,
-        marginBottom: 8,
-        flexWrap: isMobile ? 'nowrap' : 'wrap',
-        overflowX: isMobile ? 'auto' : 'visible',
-        WebkitOverflowScrolling: 'touch',
-        paddingBottom: isMobile ? '4px' : 0,
-      }}>
-        <span style={{
-          color: '#fff',
-          fontSize: isMobile ? 11 : 14,
-          fontWeight: 700,
-          whiteSpace: 'nowrap',
-          background: 'rgba(13,61,36,.5)',
-          padding: isMobile ? '4px 10px' : '4px 12px',
-          borderRadius: '30px',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(255,255,255,.2)',
-          flexShrink: 0,
+        {/* gradient overlay */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(13,61,36,.55) 0%, rgba(13,61,36,.72) 55%, rgba(13,61,36,.92) 100%)'
+        }} />
+
+        {/* content - FIXED WITH HEADER PADDING */}
+        <div style={{
+          position: 'relative',
+          zIndex: 2,
+          maxWidth: containerMaxWidth,
+          margin: '0 auto',
+          padding: isMobile ? `${headerHeight + 20}px 12px 20px` : '0 40px',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          overflowY: isMobile ? 'auto' : 'visible',
         }}>
-          🔍 Browse:
-        </span>
-        
-        {[['🌟 Premium', 'premium'], ['🐾 Pet friendly', 'pet-friendly'], ['📅 Long term', 'long-term'], ['✓ Verified', 'verified']].map(([l, f]) => (
-          <button
-            key={f}
-            onClick={() => nav(`/properties?filter=${f}`)}
-            style={{
-              background: 'rgba(255,255,255,.15)',
-              border: '1.5px solid rgba(255,255,255,.25)',
-              color: '#fff',
-              borderRadius: 40,
-              padding: isMobile ? '6px 12px' : '6px 16px',
-              fontSize: isMobile ? 11 : 13,
-              fontWeight: 600,
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-              flexShrink: 0,
-            }}
-          >
-            {l}
-          </button>
-        ))}
-      </div>
+          {/* sub-label */}
+          <div style={{ marginBottom: isMobile ? 8 : 16 }}>
+            <span style={{
+              ...pill('rgba(245,166,35,.2)', G.y500),
+              border: '1.5px solid rgba(245,166,35,.45)',
+              fontSize: isMobile ? 9 : 12,
+              padding: isMobile ? '3px 8px' : '4px 12px',
+              display: 'inline-block'
+            }}>
+              ✦ TRUSTED HOUSE SITTING · 65+ COUNTRIES
+            </span>
+          </div>
+
+          {/* headline */}
+          <h1 style={{
+            fontSize: isMobile ? 'clamp(22px, 7vw, 28px)' : 'clamp(38px, 5.5vw, 68px)',
+            fontWeight: 900,
+            color: '#fff',
+            lineHeight: 1.2,
+            letterSpacing: '-.04em',
+            maxWidth: isMobile ? '100%' : 720,
+            marginBottom: isMobile ? 12 : 20
+          }}>
+            Your home,<br />
+            <span style={{ color: G.y500 }}>Beautifully Cared for.</span>
+          </h1>
+
+          {/* description - Always visible but smaller on mobile */}
+          <p style={{
+            fontSize: isMobile ? 14 : 17,
+            color: 'rgba(255,255,255,.72)',
+            maxWidth: isMobile ? '100%' : 500,
+            lineHeight: 1.6,
+            marginBottom: isMobile ? 16 : 36,
+            fontWeight: 500,
+            display: 'block',
+          }}>
+            Connect with verified house Sitters and Listers worldwide. Secure, flexible arrangements — monthly or nightly.
+          </p>
+
+          {/* search card */}
+          <div style={{ 
+            maxWidth: isMobile ? '100%' : 820,
+            marginBottom: isMobile ? '8px' : 0,
+          }}>
+            {/* stay toggle */}
+            <div style={{
+              display: 'flex',
+              marginBottom: 0,
+              overflowX: isMobile ? 'auto' : 'visible',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: isMobile ? '2px' : 0,
+              gap: '2px'
+            }}>
+              {(['Monthly', 'Nightly'] as const).map(m => (
+                <button
+                  key={m}
+                  onClick={() => setStayMode(m)}
+                  style={{
+                    padding: isMobile ? '6px 12px' : '10px 24px',
+                    borderRadius: '12px 12px 0 0',
+                    fontSize: isMobile ? 11 : 13,
+                    fontWeight: 700,
+                    background: stayMode === m ? '#fff' : 'rgba(255,255,255,.15)',
+                    color: stayMode === m ? G.g800 : 'rgba(255,255,255,.75)',
+                    border: 'none',
+                    marginRight: 0,
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+
+            {/* Mobile search form */}
+            {isMobile ? (
+              <form onSubmit={handleSearch} style={{
+                background: '#fff',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 8px 24px rgba(0,0,0,.25)',
+                padding: '12px',
+                margin: '8px 0 12px 0',
+              }}>
+                <div style={{ marginBottom: '10px' }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 2 }}>Location</div>
+                  <select
+                    value={location}
+                    onChange={e => setLocation(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: `1px solid ${G.s200}`,
+                      borderRadius: '6px',
+                      fontSize: 13,
+                      color: G.s900,
+                      fontWeight: 600,
+                      background: G.wh
+                    }}
+                  >
+                    <option value="">Select location</option>
+                    {['Nairobi', 'London', 'Sydney', 'New York', 'Dubai', 'Singapore', 'Cape Town', 'Paris', 'Toronto', 'Tokyo'].map(l => <option key={l}>{l}</option>)}
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: '10px' }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 2 }}>
+                    {stayMode === 'Monthly' ? 'Monthly budget' : 'Nightly rate'}
+                  </div>
+                  <select
+                    value={budget}
+                    onChange={e => setBudget(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: `1px solid ${G.s200}`,
+                      borderRadius: '6px',
+                      fontSize: 13,
+                      color: G.s900,
+                      fontWeight: 600,
+                      background: G.wh
+                    }}
+                  >
+                    <option value="">Set budget</option>
+                    {(stayMode === 'Monthly'
+                      ? ['Under $1,000', '$1,000–$1,500', '$1,500–$2,000', '$2,000–$3,000', '$3,000+']
+                      : ['Under $80', '$80–$120', '$120–$180', '$180–$250', '$250+']
+                    ).map(b => <option key={b}>{b}</option>)}
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  style={{
+                    width: '100%',
+                    background: G.g700,
+                    color: '#fff',
+                    border: 'none',
+                    padding: '12px',
+                    fontSize: 14,
+                    fontWeight: 900,
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Check availability
+                </button>
+              </form>
+            ) : (
+              /* Desktop search form */
+              <form onSubmit={handleSearch} style={{
+                background: '#fff',
+                borderRadius: '0 16px 16px 16px',
+                overflow: 'hidden',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr auto',
+                boxShadow: '0 16px 64px rgba(0,0,0,.35)',
+                marginBottom: '20px',
+              }}>
+                {/* location */}
+                <div style={{ padding: '16px 24px', borderRight: `1px solid ${G.s200}` }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>Location</div>
+                  <select
+                    value={location}
+                    onChange={e => setLocation(e.target.value)}
+                    style={{ width: '100%', border: 'none', fontSize: 15, color: G.s900, fontWeight: 700, background: 'transparent' }}
+                  >
+                    <option value="">Select location</option>
+                    {['Nairobi', 'London', 'Sydney', 'New York', 'Dubai', 'Singapore', 'Cape Town', 'Paris', 'Toronto', 'Tokyo'].map(l => <option key={l}>{l}</option>)}
+                  </select>
+                </div>
+                {/* budget */}
+                <div style={{ padding: '16px 24px', borderRight: `1px solid ${G.s200}` }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: G.s400, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>
+                    {stayMode === 'Monthly' ? 'Monthly budget' : 'Nightly rate'}
+                  </div>
+                  <select
+                    value={budget}
+                    onChange={e => setBudget(e.target.value)}
+                    style={{ width: '100%', border: 'none', fontSize: 15, color: G.s900, fontWeight: 700, background: 'transparent' }}
+                  >
+                    <option value="">Set budget</option>
+                    {(stayMode === 'Monthly'
+                      ? ['Under $1,000', '$1,000–$1,500', '$1,500–$2,000', '$2,000–$3,000', '$3,000+']
+                      : ['Under $80', '$80–$120', '$120–$180', '$180–$250', '$250+']
+                    ).map(b => <option key={b}>{b}</option>)}
+                  </select>
+                </div>
+                <button type="submit" style={{
+                  background: G.g700,
+                  color: '#fff',
+                  border: 'none',
+                  padding: '0 36px',
+                  fontSize: 14,
+                  fontWeight: 900,
+                  letterSpacing: '.01em',
+                  cursor: 'pointer'
+                }}>
+                  Check availability
+                </button>
+              </form>
+            )}
+
+            {/* quick filters */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              marginTop: 8,
+              flexWrap: isMobile ? 'nowrap' : 'wrap',
+              overflowX: isMobile ? 'auto' : 'visible',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: isMobile ? '4px' : 0,
+            }}>
+              <span style={{
+                color: '#fff',
+                fontSize: isMobile ? 11 : 14,
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+                background: 'rgba(13,61,36,.5)',
+                padding: isMobile ? '4px 10px' : '4px 12px',
+                borderRadius: '30px',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,.2)',
+                flexShrink: 0,
+              }}>
+                🔍 Browse:
+              </span>
+              
+              {[['🌟 Premium', 'premium'], ['🐾 Pet friendly', 'pet-friendly'], ['📅 Long term', 'long-term'], ['✓ Verified', 'verified']].map(([l, f]) => (
+                <button
+                  key={f}
+                  onClick={() => nav(`/properties?filter=${f}`)}
+                  style={{
+                    background: 'rgba(255,255,255,.15)',
+                    border: '1.5px solid rgba(255,255,255,.25)',
+                    color: '#fff',
+                    borderRadius: 40,
+                    padding: isMobile ? '6px 12px' : '6px 16px',
+                    fontSize: isMobile ? 11 : 13,
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(8px)',
+                    flexShrink: 0,
+                  }}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* hero dots */}
+          {!isMobile && (
+            <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
+              {IMGS.hero.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setHeroIdx(i);
+                    setHeroAnim(true);
+                  }}
+                  style={{
+                    width: heroIdx === i ? 28 : 8,
+                    height: 8,
+                    borderRadius: 999,
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    background: heroIdx === i ? G.y500 : 'rgba(255,255,255,.35)',
+                    transition: 'all .35s ease',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* scroll hint - hide on mobile */}
+        {!isMobile && (
+          <div style={{
+            position: 'absolute',
+            bottom: 24,
+            right: 48,
+            color: 'rgba(255,255,255,.4)',
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '.1em',
+            transform: 'rotate(90deg)',
+            transformOrigin: 'right center'
+          }}>
+            SCROLL ↓
+          </div>
+        )}
+      </section>
 
       {/* ══ TICKER STRIP ══ */}
       <div style={{ background: G.y500, padding: isMobile ? '8px 0' : '11px 0', overflow: 'hidden' }}>
@@ -1394,40 +1531,6 @@ export const Home: React.FC = () => {
           ))}
         </div>
       </div>
-      
-      {/* Hint for scrolling */}
-      {isMobile && (
-        <div style={{
-          textAlign: 'center',
-          color: 'rgba(255,255,255,.5)',
-          fontSize: '9px',
-          marginTop: '2px',
-        }}>
-          ← swipe for more filters →
-        </div>
-      )}
-    </div>
-  </div>
-
-  {/* scroll hint - hide on mobile */}
-  {!isMobile && (
-    <div style={{
-      position: 'absolute',
-      bottom: 24,
-      right: 48,
-      color: 'rgba(255,255,255,.4)',
-      fontSize: 12,
-      fontWeight: 600,
-      letterSpacing: '.1em',
-      transform: 'rotate(90deg)',
-      transformOrigin: 'right center'
-    }}>
-      SCROLL ↓
-    </div>
-  )}
-</section>
-
-
 
       {/* ══ HERO TAGLINE + FEATURE CHIPS ══ */}
       <section ref={s1.ref} style={{ padding: sectionPadding, background: G.s100 }}>
