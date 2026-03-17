@@ -1019,99 +1019,7 @@ export const Home: React.FC = () => {
       width: '100%',
       maxWidth: '100vw'
     }}>
-      {/* ══ FIXED HEADER - Always visible with proper spacing ══ */}
-      <header style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: headerHeight,
-        background: isMobile ? 'rgba(255,255,255,.98)' : 'transparent',
-        backdropFilter: isMobile ? 'blur(10px)' : 'none',
-        borderBottom: isMobile ? `1px solid ${G.s200}` : 'none',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        padding: isMobile ? '0 16px' : '0 40px',
-      }}>
-        <div style={{
-          maxWidth: containerMaxWidth,
-          margin: '0 auto',
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-          {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => nav('/')}>
-            <svg width={isMobile ? 28 : 32} height={isMobile ? 28 : 32} viewBox="0 0 34 34" fill="none">
-              <rect width="34" height="34" rx="9" fill={G.y500} />
-              <path d="M17 7L8 14v13h6v-8h6v8h6V14z" fill={G.g900} />
-            </svg>
-            <span style={{
-              fontWeight: 900,
-              fontSize: isMobile ? 16 : 18,
-              color: isMobile ? G.g900 : '#fff',
-            }}>howsitter</span>
-          </div>
 
-          {/* Desktop Navigation */}
-          {!isMobile && (
-            <nav style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
-              {['Properties', 'Sitters', 'How It Works'].map(item => (
-                <button
-                  key={item}
-                  onClick={() => nav(`/${item.toLowerCase().replace(' ', '-')}`)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#fff',
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    padding: '8px 0',
-                  }}
-                >
-                  {item}
-                </button>
-              ))}
-              <button
-                onClick={() => nav('/login')}
-                style={{
-                  background: 'rgba(255,255,255,.15)',
-                  border: '1.5px solid rgba(255,255,255,.3)',
-                  color: '#fff',
-                  borderRadius: 30,
-                  padding: '8px 20px',
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
-                Sign In
-              </button>
-            </nav>
-          )}
-
-          {/* Mobile Menu Button */}
-          {isMobile && (
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: 24,
-                cursor: 'pointer',
-                padding: 8,
-                color: G.g900,
-              }}
-            >
-              ☰
-            </button>
-          )}
-        </div>
-      </header>
 
       {/* ══ MOBILE MENU ══ */}
       {isMobile && mobileMenuOpen && (
@@ -1507,7 +1415,7 @@ export const Home: React.FC = () => {
       </section>
 
       {/* ══ TICKER STRIP ══ */}
-      <div style={{ background: G.y500, padding: isMobile ? '8px 0' : '11px 0', overflow: 'hidden' }}>
+      <div style={{ background: G.y500, padding: isMobile ? '10px 0' : '15px 0', overflow: 'hidden' }}>
         <div style={{
           display: 'inline-block',
           animation: `ticker ${isMobile ? '24s' : '32s'} linear infinite`,
@@ -1517,7 +1425,7 @@ export const Home: React.FC = () => {
             <span key={ri}>
               {['🏡 Fully Furnished', '✓ Verified Sitters', '📋 Flexible Contracts', '🐾 Pet Friendly', '📶 Fast Wifi', '🔧 Maintenance Support', '🎉 Community Events', '🌍 65+ Countries', '⭐ 4.8 Rating'].map(item => (
                 <span key={item} style={{
-                  marginRight: isMobile ? 20 : 52,
+                  marginRight: isMobile ? 30 : 52,
                   fontSize: isMobile ? 9 : 12,
                   fontWeight: 800,
                   color: G.g900,
