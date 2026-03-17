@@ -86,11 +86,11 @@ export const Layout: React.FC<LayoutProps> = ({
 
   // Main navigation items
   const mainNavItems = [
-    { label: 'view homes', path: '/properties' },
-    { label: 'find sitters', path: '/sitters' },
-    { label: 'how it works', path: '/how-it-works' },
-    { label: 'community', path: '/community' },
-    { label: 'corporate', path: '/corporate' },
+    { label: 'View homes', path: '/properties' },
+    { label: 'Find sitters', path: '/sitters' },
+    { label: 'How it works', path: '/how-it-works' },
+    { label: 'Community', path: '/community' },
+    { label: 'Corporate', path: '/corporate' },
   ];
 
   // Secondary/utility nav items
