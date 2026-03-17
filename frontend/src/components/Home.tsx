@@ -1125,7 +1125,7 @@ export const Home: React.FC = () => {
             marginBottom: isMobile ? 12 : 20
           }}>
             Your home,<br />
-            <span style={{ color: G.y500 }}>beautifully</span> cared for.
+            <span style={{ color: G.y500 }}>Beautifully</span> Cared for.
           </h1>
 
           <p style={{
@@ -1496,7 +1496,7 @@ export const Home: React.FC = () => {
               marginBottom: 20
             }}>
               The most trusted<br />
-              <span style={{ color: G.g700 }}>house sitting</span> network
+              <span style={{ color: G.g700 }}>House sitting</span> Network
             </h2>
             <p style={{
               fontSize: isMobile ? 15 : 16,
@@ -1647,7 +1647,7 @@ export const Home: React.FC = () => {
                 color: G.g900,
                 letterSpacing: '-.03em'
               }}>
-                love where you live
+                Love where you live
               </h2>
               <p style={{ color: G.s400, fontSize: isMobile ? 14 : 15, marginTop: 6, fontWeight: 500 }}>
                 Handpicked homes needing trusted sitters
@@ -1744,7 +1744,7 @@ export const Home: React.FC = () => {
                   color: G.g900,
                   letterSpacing: '-.03em'
                 }}>
-                  browse the best listings
+                  Browse the best listings
                 </h2>
                 <p style={{ color: G.s400, fontSize: isMobile ? 14 : 15, marginTop: 6, fontWeight: 500 }}>
                   Properties & sitters at special rates
